@@ -9,8 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "event_type")
-public class EventType {
+@Table(name= "role")
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -18,7 +18,6 @@ public class EventType {
 
     @Size(max = 45)
     @NotNull
-    @Column(name = "role", nullable = false, length = 45)
-    private String role;
-
+    @Column(name = "event", nullable = false, length = 45)
+    private String name;
 }
