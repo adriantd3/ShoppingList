@@ -25,22 +25,22 @@ public class User implements UserDetails {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Size(max = 45)
+    @Size(max = 255)
     @NotNull
     @Column(name = "name", nullable = false, length = 45)
     private String name;
 
-    @Size(max = 45)
+    @Size(max = 255)
     @NotNull
     @Column(name = "lastname", nullable = false, length = 45)
     private String lastname;
 
-    @Size(max = 45)
+    @Size(max = 255)
     @NotNull
     @Column(name = "email", nullable = false, length = 45)
     private String email;
 
-    @Size(max = 45)
+    @Size(max = 255)
     @NotNull
     @Column(name = "password", nullable = false, length = 45)
     private String password;
@@ -50,15 +50,14 @@ public class User implements UserDetails {
     private Byte premium;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @ColumnDefault("1")
     @JoinColumn(name = "role", nullable = false)
     private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.getName()));
+        return List.of(new SimpleGrantedAuthority(role.getRole()));
     }
 
     @Override

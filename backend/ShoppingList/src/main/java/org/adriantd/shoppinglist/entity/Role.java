@@ -18,6 +18,6 @@ public class Role {
 
     @Size(max = 45)
     @NotNull
-    @Column(name = "event", nullable = false, length = 45)
-    private String name;
+    @Column(name = "role", nullable = false, length = 45)
+    private String role;
 }
