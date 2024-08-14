@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -16,22 +17,25 @@ import org.springframework.security.web.authentication.AuthenticationFilter;
 public class FilterChainConfig {
 
     private final AuthenticationProvider authenticationProvider;
+    private final JWTFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 .csrf(crsf -> crsf.disable())
-            .authorizeHttpRequests(authorizeRequests ->
-                authorizeRequests
-                    .requestMatchers("/auth/**").permitAll()
-                    .anyRequest().authenticated()
-            ).sessionManagement(sessionManagement ->
-                sessionManagement
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            ).authenticationProvider(authenticationProvider).
-
-
-        return http.build();
+                .authorizeHttpRequests(authorizeRequests ->
+                        authorizeRequests
+                                //Allows auth endpoints to be accessed without authentication
+                                //jwtFilter and UsernamePasswordAuthenticationFilter will not be applied to these endpoints
+                                .requestMatchers("/auth/**").permitAll()
+                                .anyRequest().authenticated()
+                ).sessionManagement(sessionManagement ->
+                        sessionManagement
+                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)//REST APIs are STATELESS
+                ).authenticationProvider(authenticationProvider) //Sets default authentication provider
+                //Check for JWT in every request and then
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
 }
