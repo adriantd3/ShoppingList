@@ -1,15 +1,12 @@
-package org.adriantd.shoppinglist.controller;
+package org.adriantd.shoppinglist.auth.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.adriantd.shoppinglist.auth.AuthService;
-import org.adriantd.shoppinglist.dto.AuthResponse;
-import org.adriantd.shoppinglist.dto.LoginRequest;
-import org.adriantd.shoppinglist.dto.RegisterRequest;
+import org.adriantd.shoppinglist.auth.service.AuthService;
+import org.adriantd.shoppinglist.auth.dto.AuthResponse;
+import org.adriantd.shoppinglist.auth.dto.LoginRequest;
+import org.adriantd.shoppinglist.auth.dto.RegisterRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")

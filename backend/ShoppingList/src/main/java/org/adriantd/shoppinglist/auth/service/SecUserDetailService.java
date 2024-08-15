@@ -1,4 +1,4 @@
-package org.adriantd.shoppinglist.service;
+package org.adriantd.shoppinglist.auth.service;
 
 import lombok.RequiredArgsConstructor;
 import org.adriantd.shoppinglist.dao.UserRepository;

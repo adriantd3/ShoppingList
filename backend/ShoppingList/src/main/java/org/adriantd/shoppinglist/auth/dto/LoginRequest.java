@@ -1,4 +1,4 @@
-package org.adriantd.shoppinglist.dto;
+package org.adriantd.shoppinglist.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterRequest {
-    String name;
-    String lastname;
+public class LoginRequest {
     String email;
     String password;
 }

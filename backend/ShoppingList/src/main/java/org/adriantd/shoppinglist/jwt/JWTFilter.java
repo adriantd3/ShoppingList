@@ -1,4 +1,4 @@
-package org.adriantd.shoppinglist.auth;
+package org.adriantd.shoppinglist.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

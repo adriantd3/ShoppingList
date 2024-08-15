@@ -1,4 +1,4 @@
-package org.adriantd.shoppinglist.dto;
+package org.adriantd.shoppinglist.auth.dto;
 
 import lombok.Builder;
 import lombok.Data;
