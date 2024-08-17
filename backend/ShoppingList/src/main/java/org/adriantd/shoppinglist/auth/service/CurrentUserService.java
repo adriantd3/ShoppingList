@@ -24,4 +24,8 @@ public class CurrentUserService {
     public Integer getCurrentUserId() throws Exception {
         return userRepository.findByNickname(getCurrentUser().getUsername()).orElseThrow().getId();
     }
+
+    public String getCurrentUserNickname() throws Exception {
+        return getCurrentUser().getUsername();
+    }
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewProductRequest {
+public class ProductRequest {
     String name;
     String image;
     String magnitude;
