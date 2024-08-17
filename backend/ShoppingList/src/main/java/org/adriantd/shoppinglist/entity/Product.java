@@ -6,17 +6,19 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.adriantd.shoppinglist.products.dto.ProductResponse;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "product")
-public class Product {
+public class Product implements Serializable, DTO<ProductResponse> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -46,4 +48,17 @@ public class Product {
     @Column(name = "timestamp")
     private Instant timestamp;
 
+    @Override
+    public ProductResponse toDTO() {
+        ProductResponse productResponse = new ProductResponse();
+
+        productResponse.setId(this.id);
+        productResponse.setOwner(this.user.getUsername());
+        productResponse.setName(this.name);
+        productResponse.setImage(this.image);
+        productResponse.setMagnitude(this.magnitude);
+        productResponse.setTimestamp(this.timestamp.toString());
+
+        return productResponse;
+    }
 }

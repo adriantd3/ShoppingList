@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NewProductRequest {
-    Integer id;
     String name;
     String image;
     String magnitude;

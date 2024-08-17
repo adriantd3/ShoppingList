@@ -6,11 +6,13 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @Entity
 @Table(name = "shoplist_members")
-public class ShoplistMember {
+public class ShoplistMember implements Serializable {
     @EmbeddedId
     private ShoplistMemberId id;
 

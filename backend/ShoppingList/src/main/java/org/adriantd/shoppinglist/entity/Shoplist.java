@@ -9,6 +9,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -17,7 +18,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "shoplist")
-public class Shoplist {
+public class Shoplist implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductResponse {
     Integer id;
-    Integer userId;
+    String owner;
     String name;
     String image;
     String magnitude;

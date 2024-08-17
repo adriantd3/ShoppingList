@@ -8,11 +8,13 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @Entity
 @Table(name = "item")
-public class Item {
+public class Item implements Serializable {
     @EmbeddedId
     private ItemId id;
 
