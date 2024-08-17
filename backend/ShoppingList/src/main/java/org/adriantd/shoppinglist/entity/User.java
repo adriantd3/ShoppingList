@@ -50,14 +50,14 @@ public class User implements UserDetails {
     private Byte premium;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "role", nullable = false)
-    private Role role;
-
+    @ColumnDefault("'ROLE_USER'")
+    @Lob
+    @Column(name = "role", nullable = false)
+    private String role;
+    
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.getRole()));
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override

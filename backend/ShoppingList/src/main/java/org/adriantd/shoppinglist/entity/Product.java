@@ -38,10 +38,9 @@ public class Product {
     private String image;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "magnitude", nullable = false)
-    private MagnitudeType magnitude;
+    @Lob
+    @Column(name = "magnitude", nullable = false)
+    private String magnitude;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "timestamp")
