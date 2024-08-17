@@ -2,12 +2,10 @@ package org.adriantd.shoppinglist.auth.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.adriantd.shoppinglist.dao.RoleRepository;
 import org.adriantd.shoppinglist.dao.UserRepository;
 import org.adriantd.shoppinglist.auth.dto.AuthResponse;
 import org.adriantd.shoppinglist.auth.dto.LoginRequest;
 import org.adriantd.shoppinglist.auth.dto.RegisterRequest;
-import org.adriantd.shoppinglist.entity.Role;
 import org.adriantd.shoppinglist.entity.User;
 import org.adriantd.shoppinglist.jwt.JWTService;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,14 +21,13 @@ public class AuthService {
     private final JWTService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     public AuthResponse login(LoginRequest loginRequest) {
         //If authentication fails, an exception will be thrown
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-        UserDetails userDetails = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow();
+                new UsernamePasswordAuthenticationToken(loginRequest.getNickname(), loginRequest.getPassword()));
+        UserDetails userDetails = userRepository.findByNickname(loginRequest.getNickname()).orElseThrow();
 
         //Once the user is authenticated, a token is generated and sent back to the client
         String token = jwtService.getToken(userDetails);
@@ -40,14 +37,13 @@ public class AuthService {
     @Transactional
     public AuthResponse register(RegisterRequest registerRequest) {
         User user = new User();
-        Role role = roleRepository.findById(1).orElseThrow();
-        role.setId(1);
+        user.setNickname(registerRequest.getNickname());
         user.setName(registerRequest.getName());
         user.setLastname(registerRequest.getLastname());
         user.setEmail(registerRequest.getEmail());
         //The password is encrypted before being stored in the database
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setRole(role);
+        user.setRole("ROLE_USER");
         user.setPremium((byte) 0);
         userRepository.save(user);
 

@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,11 +20,16 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "user")
-public class User implements UserDetails {
+public class User implements Serializable, UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
+
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "nickname", nullable = false)
+    private String nickname;
 
     @Size(max = 255)
     @NotNull
@@ -54,7 +60,7 @@ public class User implements UserDetails {
     @Lob
     @Column(name = "role", nullable = false)
     private String role;
-    
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role));
@@ -62,7 +68,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.getEmail();
+        return this.getNickname();
     }
 
     @Override

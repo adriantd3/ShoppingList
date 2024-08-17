@@ -22,6 +22,6 @@ public class CurrentUserService {
     }
 
     public Integer getCurrentUserId() throws Exception {
-        return userRepository.findByEmail(getCurrentUser().getUsername()).orElseThrow().getId();
+        return userRepository.findByNickname(getCurrentUser().getUsername()).orElseThrow().getId();
     }
 }

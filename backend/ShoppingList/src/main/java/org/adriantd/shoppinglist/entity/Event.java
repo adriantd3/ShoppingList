@@ -8,13 +8,14 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "event")
-public class Event {
+public class Event implements Serializable {
     @Id
     @Column(name = "id", nullable = false)
     private Integer id;
