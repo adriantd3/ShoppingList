@@ -36,10 +36,9 @@ public class Shoplist implements Serializable {
     private String name;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "type", nullable = false)
-    private ShoplistType type;
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ListType type;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "timestamp")
