@@ -6,6 +6,7 @@ import org.adriantd.shoppinglist.dao.UserRepository;
 import org.adriantd.shoppinglist.auth.dto.AuthResponse;
 import org.adriantd.shoppinglist.auth.dto.LoginRequest;
 import org.adriantd.shoppinglist.auth.dto.RegisterRequest;
+import org.adriantd.shoppinglist.entity.RoleType;
 import org.adriantd.shoppinglist.entity.User;
 import org.adriantd.shoppinglist.jwt.JWTService;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,7 +44,7 @@ public class AuthService {
         user.setEmail(registerRequest.getEmail());
         //The password is encrypted before being stored in the database
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setRole("ROLE_USER");
+        user.setRole(RoleType.ROLE_USER);
         user.setPremium((byte) 0);
         userRepository.save(user);
 

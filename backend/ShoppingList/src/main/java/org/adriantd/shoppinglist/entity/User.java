@@ -59,11 +59,12 @@ public class User implements Serializable, UserDetails {
     @ColumnDefault("'ROLE_USER'")
     @Lob
     @Column(name = "role", nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private RoleType role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
