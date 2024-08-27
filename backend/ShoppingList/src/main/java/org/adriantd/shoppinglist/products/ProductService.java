@@ -7,20 +7,35 @@ import org.adriantd.shoppinglist.entity.Product;
 import org.adriantd.shoppinglist.entity.User;
 import org.adriantd.shoppinglist.products.dto.ProductRequest;
 import org.adriantd.shoppinglist.products.dto.ProductResponse;
+import org.adriantd.shoppinglist.utils.DTOService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.net.http.HttpResponse;
 import java.nio.file.AccessDeniedException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
-public class ProductService {
+public class ProductService extends DTOService {
 
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+
+    public ProductResponse getProduct(Integer productId){
+        Product product = productRepository.findById(productId).orElseThrow(NoSuchElementException::new);
+
+        return product.toDTO();
+    }
+
+    public List<ProductResponse> getAllUserProducts(Integer userId){
+        List<Product> userProducts = productRepository.findAllByUserId(userId).orElse(new ArrayList<>());
+
+        return entidadesADTO(userProducts);
+    }
 
     public ProductResponse registerProduct(ProductRequest productRequest, Integer userId) {
         User user = userRepository.findById(userId).orElseThrow();
