@@ -7,20 +7,24 @@ import lombok.Getter;
 import lombok.Setter;
 import org.adriantd.shoppinglist.auth.entity.User;
 import org.adriantd.shoppinglist.entity.Event;
+import org.adriantd.shoppinglist.lists.dto.ListInfoResponse;
+import org.adriantd.shoppinglist.utils.DTO;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "shoplist")
-public class Shoplist implements Serializable {
+public class Shoplist implements Serializable, DTO<ListInfoResponse> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -50,16 +54,27 @@ public class Shoplist implements Serializable {
     @Column(name = "n_items")
     private Integer nItems;
 
-    @OneToMany(mappedBy = "shoplist")
-    private Set<Event> events = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "shoplist")
-    private Set<Item> items = new LinkedHashSet<>();
-
     @ManyToMany
     @JoinTable(name = "shoplist_members",
             joinColumns = @JoinColumn(name = "shoplist_id"),
             inverseJoinColumns = @JoinColumn(name = "member_id"))
-    private Set<User> users = new LinkedHashSet<>();
+    private List<User> users = new ArrayList<>();
 
+    @Override
+    public ListInfoResponse toDTO() {
+        List<String> members = new ArrayList<>();
+        for(User member : users){
+            members.add(member.getNickname());
+        }
+
+        return ListInfoResponse.builder()
+                .id(id)
+                .owner(userOwner.getNickname())
+                .name(name)
+                .members(members)
+                .type(type)
+                .n_items(nItems)
+                .timestamp(timestamp.toString())
+                .build();
+    }
 }
