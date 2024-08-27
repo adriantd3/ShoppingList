@@ -2,13 +2,13 @@ package org.adriantd.shoppinglist.auth.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.adriantd.shoppinglist.dao.UserRepository;
+import org.adriantd.shoppinglist.auth.dao.UserRepository;
 import org.adriantd.shoppinglist.auth.dto.AuthResponse;
 import org.adriantd.shoppinglist.auth.dto.LoginRequest;
 import org.adriantd.shoppinglist.auth.dto.RegisterRequest;
-import org.adriantd.shoppinglist.entity.RoleType;
-import org.adriantd.shoppinglist.entity.User;
-import org.adriantd.shoppinglist.jwt.JWTService;
+import org.adriantd.shoppinglist.auth.entity.RoleType;
+import org.adriantd.shoppinglist.auth.entity.User;
+import org.adriantd.shoppinglist.auth.jwt.JWTService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,7 +1,5 @@
 package org.adriantd.shoppinglist.utils;
 
-import org.adriantd.shoppinglist.entity.DTO;
-
 import java.util.ArrayList;
 import java.util.List;
 

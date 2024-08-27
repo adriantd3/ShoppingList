@@ -1,6 +1,6 @@
-package org.adriantd.shoppinglist.dao;
+package org.adriantd.shoppinglist.products.dao;
 
-import org.adriantd.shoppinglist.entity.Product;
+import org.adriantd.shoppinglist.products.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

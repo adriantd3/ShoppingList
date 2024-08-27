@@ -1,8 +1,8 @@
 package org.adriantd.shoppinglist.auth.service;
 
 import lombok.RequiredArgsConstructor;
-import org.adriantd.shoppinglist.dao.UserRepository;
-import org.adriantd.shoppinglist.entity.User;
+import org.adriantd.shoppinglist.auth.dao.UserRepository;
+import org.adriantd.shoppinglist.auth.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

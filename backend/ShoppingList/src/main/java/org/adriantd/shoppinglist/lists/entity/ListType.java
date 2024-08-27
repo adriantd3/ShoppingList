@@ -1,4 +1,4 @@
-package org.adriantd.shoppinglist.entity;
+package org.adriantd.shoppinglist.lists.entity;
 
 public enum ListType {
     LIST_REC,

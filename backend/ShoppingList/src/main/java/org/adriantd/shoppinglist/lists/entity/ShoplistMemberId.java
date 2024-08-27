@@ -1,4 +1,4 @@
-package org.adriantd.shoppinglist.entity;
+package org.adriantd.shoppinglist.lists.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -12,28 +12,28 @@ import java.util.Objects;
 @Getter
 @Setter
 @Embeddable
-public class ItemId implements java.io.Serializable {
-    private static final long serialVersionUID = 8936172174901904352L;
+public class ShoplistMemberId implements java.io.Serializable {
+    private static final long serialVersionUID = -2739229283850398895L;
     @NotNull
     @Column(name = "shoplist_id", nullable = false)
     private Integer shoplistId;
 
     @NotNull
-    @Column(name = "product_id", nullable = false)
-    private Integer productId;
+    @Column(name = "member_id", nullable = false)
+    private Integer memberId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        ItemId entity = (ItemId) o;
-        return Objects.equals(this.productId, entity.productId) &&
-                Objects.equals(this.shoplistId, entity.shoplistId);
+        ShoplistMemberId entity = (ShoplistMemberId) o;
+        return Objects.equals(this.shoplistId, entity.shoplistId) &&
+                Objects.equals(this.memberId, entity.memberId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(productId, shoplistId);
+        return Objects.hash(shoplistId, memberId);
     }
 
 }

@@ -1,4 +1,4 @@
-package org.adriantd.shoppinglist.entity;
+package org.adriantd.shoppinglist.auth.entity;
 
 public enum RoleType {
     ROLE_ADMIN,

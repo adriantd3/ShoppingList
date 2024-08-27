@@ -1,8 +1,9 @@
-package org.adriantd.shoppinglist.entity;
+package org.adriantd.shoppinglist.lists.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.adriantd.shoppinglist.auth.entity.User;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 

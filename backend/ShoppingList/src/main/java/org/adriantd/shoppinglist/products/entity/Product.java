@@ -1,11 +1,12 @@
-package org.adriantd.shoppinglist.entity;
+package org.adriantd.shoppinglist.products.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.adriantd.shoppinglist.utils.DTO;
+import org.adriantd.shoppinglist.auth.entity.User;
 import org.adriantd.shoppinglist.products.dto.ProductResponse;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;

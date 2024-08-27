@@ -1,17 +1,15 @@
 package org.adriantd.shoppinglist.products;
 
 import lombok.RequiredArgsConstructor;
-import org.adriantd.shoppinglist.dao.ProductRepository;
-import org.adriantd.shoppinglist.dao.UserRepository;
-import org.adriantd.shoppinglist.entity.Product;
-import org.adriantd.shoppinglist.entity.User;
+import org.adriantd.shoppinglist.products.dao.ProductRepository;
+import org.adriantd.shoppinglist.auth.dao.UserRepository;
+import org.adriantd.shoppinglist.products.entity.Product;
+import org.adriantd.shoppinglist.auth.entity.User;
 import org.adriantd.shoppinglist.products.dto.ProductRequest;
 import org.adriantd.shoppinglist.products.dto.ProductResponse;
 import org.adriantd.shoppinglist.utils.DTOService;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.net.http.HttpResponse;
 import java.nio.file.AccessDeniedException;
 import java.time.Instant;
 import java.util.ArrayList;

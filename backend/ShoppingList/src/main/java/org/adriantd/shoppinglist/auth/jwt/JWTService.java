@@ -1,4 +1,4 @@
-package org.adriantd.shoppinglist.jwt;
+package org.adriantd.shoppinglist.auth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

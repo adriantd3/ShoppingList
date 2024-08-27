@@ -1,7 +1,7 @@
 package org.adriantd.shoppinglist.auth.service;
 
 import lombok.RequiredArgsConstructor;
-import org.adriantd.shoppinglist.dao.UserRepository;
+import org.adriantd.shoppinglist.auth.dao.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
