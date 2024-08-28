@@ -5,16 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.adriantd.shoppinglist.lists.entity.UnitType;
-import org.adriantd.shoppinglist.products.dto.ProductResponse;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemResponse {
+public class RegisterItemRequest {
     Integer shoplistId;
-    String user;
+    Integer productId;
     Integer units;
     UnitType type;
-    ProductResponse product;
 }
