@@ -23,7 +23,7 @@ public class CurrentUserService {
         return (UserDetails) authentication.getPrincipal();
     }
 
-    public Integer getCurrentUserId() throws Exception {
+    public Integer getCurrentUserId() throws AccessDeniedException {
         return userRepository.findByNickname(getCurrentUser().getUsername()).orElseThrow().getId();
     }
 

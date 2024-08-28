@@ -1,4 +1,4 @@
-package org.adriantd.shoppinglist.lists;
+package org.adriantd.shoppinglist.lists.service;
 
 import lombok.RequiredArgsConstructor;
 import org.adriantd.shoppinglist.auth.dao.UserRepository;
@@ -6,12 +6,12 @@ import org.adriantd.shoppinglist.auth.entity.User;
 import org.adriantd.shoppinglist.lists.dao.ShopListRepository;
 import org.adriantd.shoppinglist.lists.dto.ListInfoResponse;
 import org.adriantd.shoppinglist.lists.dto.ListRequest;
+import org.adriantd.shoppinglist.lists.dto.ListUpdateRequest;
 import org.adriantd.shoppinglist.lists.entity.Shoplist;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
+import java.nio.file.AccessDeniedException;
 import java.time.Instant;
-import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +33,28 @@ public class ListService {
         shopListRepository.save(shoplist);
 
         return shoplist.toDTO();
+    }
+
+    public void deleteShoplist(Integer id, Integer userId) throws Exception {
+        Shoplist shoplist = shopListRepository.findById(id).orElseThrow();
+
+        if (!shoplist.getUserOwner().getId().equals(userId)) {
+            throw new AccessDeniedException("LOG: User is not the owner of the shoplist");
+        }
+
+        shopListRepository.delete(shoplist);
+    }
+
+    public void updateShoplist(Integer id, ListUpdateRequest request, Integer userId) throws Exception {
+        Shoplist shoplist = shopListRepository.findById(id).orElseThrow();
+
+        if (!shoplist.getUserOwner().getId().equals(userId)) {
+            throw new AccessDeniedException("LOG: User is not the owner of the shoplist");
+        }
+
+        shoplist.setName(request.getName());
+
+        shopListRepository.save(shoplist);
     }
 
 }

@@ -51,7 +51,7 @@ public class ProductService extends DTOService {
     }
 
     public void updateProduct(Integer id, ProductRequest productRequest, String nickname) throws Exception {
-        Product product = productRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        Product product = productRepository.findById(id).orElseThrow();
 
         if (!product.getUser().getNickname().equals(nickname)) {
             throw new AccessDeniedException("LOG: User is not the owner of the product");
