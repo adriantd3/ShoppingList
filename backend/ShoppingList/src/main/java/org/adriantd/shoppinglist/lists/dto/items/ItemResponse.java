@@ -1,10 +1,10 @@
-package org.adriantd.shoppinglist.lists.dto;
+package org.adriantd.shoppinglist.lists.dto.items;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.adriantd.shoppinglist.lists.entity.UnitType;
+import org.adriantd.shoppinglist.lists.entity.items.UnitType;
 import org.adriantd.shoppinglist.products.dto.ProductResponse;
 
 @Data
@@ -17,4 +17,5 @@ public class ItemResponse {
     Integer units;
     UnitType type;
     ProductResponse product;
+    Boolean purchased;
 }

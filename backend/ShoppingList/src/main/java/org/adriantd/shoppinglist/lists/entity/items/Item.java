@@ -1,10 +1,11 @@
-package org.adriantd.shoppinglist.lists.entity;
+package org.adriantd.shoppinglist.lists.entity.items;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.adriantd.shoppinglist.auth.entity.User;
-import org.adriantd.shoppinglist.lists.dto.ItemResponse;
+import org.adriantd.shoppinglist.lists.dto.items.ItemResponse;
+import org.adriantd.shoppinglist.lists.entity.lists.Shoplist;
 import org.adriantd.shoppinglist.products.entity.Product;
 import org.adriantd.shoppinglist.utils.DTO;
 import org.hibernate.annotations.ColumnDefault;
@@ -47,6 +48,9 @@ public class Item implements Serializable, DTO<ItemResponse> {
     @Enumerated(EnumType.STRING)
     private UnitType type;
 
+    @Column(name = "purchased", nullable = false)
+    private Boolean purchased = false;
+
     @Override
     public ItemResponse toDTO() {
         return ItemResponse.builder()
@@ -55,6 +59,7 @@ public class Item implements Serializable, DTO<ItemResponse> {
                 .units(units)
                 .type(type)
                 .product(product.toDTO())
+                .purchased(purchased)
                 .build();
     }
 }

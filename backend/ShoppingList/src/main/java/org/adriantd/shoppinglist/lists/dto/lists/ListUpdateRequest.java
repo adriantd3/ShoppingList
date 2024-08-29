@@ -1,4 +1,4 @@
-package org.adriantd.shoppinglist.lists.dto;
+package org.adriantd.shoppinglist.lists.dto.lists;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

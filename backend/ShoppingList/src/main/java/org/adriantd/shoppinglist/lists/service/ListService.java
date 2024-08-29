@@ -4,23 +4,29 @@ import lombok.RequiredArgsConstructor;
 import org.adriantd.shoppinglist.auth.dao.UserRepository;
 import org.adriantd.shoppinglist.auth.entity.User;
 import org.adriantd.shoppinglist.lists.dao.ShopListRepository;
-import org.adriantd.shoppinglist.lists.dto.ListInfoResponse;
-import org.adriantd.shoppinglist.lists.dto.ListRequest;
-import org.adriantd.shoppinglist.lists.dto.ListUpdateRequest;
-import org.adriantd.shoppinglist.lists.entity.Shoplist;
+import org.adriantd.shoppinglist.lists.dto.lists.ListInfoResponse;
+import org.adriantd.shoppinglist.lists.dto.lists.ListRequest;
+import org.adriantd.shoppinglist.lists.dto.lists.ListUpdateRequest;
+import org.adriantd.shoppinglist.lists.entity.lists.Shoplist;
+import org.adriantd.shoppinglist.utils.DTOService;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ListService {
+public class ListService extends DTOService {
 
     private final ShopListRepository shopListRepository;
     private final UserRepository userRepository;
+
+    public List<ListInfoResponse> getListsInfo(List<Integer> ids){
+        List<Shoplist> lists = shopListRepository.findAllById(ids);
+
+        return entidadesADTO(lists);
+    }
 
     public ListInfoResponse registerShoplist(ListRequest request, Integer userId){
         User owner = userRepository.findById(userId).orElseThrow();

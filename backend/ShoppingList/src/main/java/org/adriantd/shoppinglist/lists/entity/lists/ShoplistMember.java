@@ -1,4 +1,4 @@
-package org.adriantd.shoppinglist.lists.entity;
+package org.adriantd.shoppinglist.lists.entity.lists;
 
 import jakarta.persistence.*;
 import lombok.Getter;

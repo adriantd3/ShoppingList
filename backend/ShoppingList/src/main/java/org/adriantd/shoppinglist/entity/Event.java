@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.adriantd.shoppinglist.auth.entity.User;
-import org.adriantd.shoppinglist.lists.entity.Shoplist;
+import org.adriantd.shoppinglist.lists.entity.lists.Shoplist;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;

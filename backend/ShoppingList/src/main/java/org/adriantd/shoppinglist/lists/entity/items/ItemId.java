@@ -1,4 +1,4 @@
-package org.adriantd.shoppinglist.lists.entity;
+package org.adriantd.shoppinglist.lists.entity.items;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

@@ -1,4 +1,4 @@
-package org.adriantd.shoppinglist.lists.entity;
+package org.adriantd.shoppinglist.lists.entity.lists;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -6,8 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.adriantd.shoppinglist.auth.entity.User;
-import org.adriantd.shoppinglist.entity.Event;
-import org.adriantd.shoppinglist.lists.dto.ListInfoResponse;
+import org.adriantd.shoppinglist.lists.dto.lists.ListInfoResponse;
 import org.adriantd.shoppinglist.utils.DTO;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
@@ -16,10 +15,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter

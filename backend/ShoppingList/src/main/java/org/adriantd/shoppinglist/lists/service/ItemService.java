@@ -5,12 +5,12 @@ import org.adriantd.shoppinglist.auth.dao.UserRepository;
 import org.adriantd.shoppinglist.auth.entity.User;
 import org.adriantd.shoppinglist.lists.dao.ItemRepository;
 import org.adriantd.shoppinglist.lists.dao.ShopListRepository;
-import org.adriantd.shoppinglist.lists.dto.ItemRequest;
-import org.adriantd.shoppinglist.lists.dto.RegisterItemRequest;
-import org.adriantd.shoppinglist.lists.dto.ItemResponse;
-import org.adriantd.shoppinglist.lists.entity.Item;
-import org.adriantd.shoppinglist.lists.entity.ItemId;
-import org.adriantd.shoppinglist.lists.entity.Shoplist;
+import org.adriantd.shoppinglist.lists.dto.items.ItemRequest;
+import org.adriantd.shoppinglist.lists.dto.items.RegisterItemRequest;
+import org.adriantd.shoppinglist.lists.dto.items.ItemResponse;
+import org.adriantd.shoppinglist.lists.entity.items.Item;
+import org.adriantd.shoppinglist.lists.entity.items.ItemId;
+import org.adriantd.shoppinglist.lists.entity.lists.Shoplist;
 import org.adriantd.shoppinglist.products.dao.ProductRepository;
 import org.adriantd.shoppinglist.products.entity.Product;
 import org.springframework.stereotype.Service;
@@ -48,26 +48,34 @@ public class ItemService {
         item.setUser(user);
         item.setUnits(registerItemRequest.getUnits());
         item.setType(registerItemRequest.getType());
+        item.setPurchased(false);
 
         itemRepository.save(item);
 
         return item.toDTO();
     }
 
-    public void removeItemFromList(ItemRequest itemRequest, String nickname) throws Exception {
+    public void removeItemsFromRequest(ItemRequest itemRequest, String nickname) throws Exception {
         User user = userRepository.findByNickname(nickname).orElseThrow();
         Shoplist shoplist = shopListRepository.findById(itemRequest.getShoplistId()).orElseThrow();
         if(!isUserAllowed(shoplist, user)) {
             throw new AccessDeniedException("LOG: User not member or owner of the list");
         }
 
-        ItemId itemId = new ItemId(itemRequest.getShoplistId(), itemRequest.getProductId());
+        Integer[] productIds = itemRequest.getProductIds();
+        for (Integer productId : productIds) {
+            removeSingleItem(itemRequest.getShoplistId(), productId);
+        }
+
+    }
+
+    public void removeSingleItem(Integer shoplistId, Integer productId) throws Exception {
+        ItemId itemId = new ItemId(shoplistId,productId);
         if(!isItemAlreadyExisting(itemId)) {
             throw new AccessDeniedException("LOG: Item does not exist");
         }
 
         itemRepository.deleteById(itemId);
-
     }
 
     /**

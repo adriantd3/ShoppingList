@@ -1,10 +1,10 @@
-package org.adriantd.shoppinglist.lists.dto;
+package org.adriantd.shoppinglist.lists.dto.lists;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.adriantd.shoppinglist.lists.entity.ListType;
+import org.adriantd.shoppinglist.lists.entity.lists.ListType;
 
 @Data
 @Builder

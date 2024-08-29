@@ -2,9 +2,9 @@ package org.adriantd.shoppinglist.lists.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.adriantd.shoppinglist.auth.service.CurrentUserService;
-import org.adriantd.shoppinglist.lists.dto.ItemRequest;
-import org.adriantd.shoppinglist.lists.dto.RegisterItemRequest;
-import org.adriantd.shoppinglist.lists.dto.ItemResponse;
+import org.adriantd.shoppinglist.lists.dto.items.ItemRequest;
+import org.adriantd.shoppinglist.lists.dto.items.RegisterItemRequest;
+import org.adriantd.shoppinglist.lists.dto.items.ItemResponse;
 import org.adriantd.shoppinglist.lists.service.ItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +20,11 @@ public class ItemController {
     private final ItemService itemService;
     private final CurrentUserService currentUserService;
 
+    @GetMapping("/{shoplistId}")
+    public ResponseEntity<ItemResponse> getListItems(@PathVariable int shoplistId) {
+        return null;
+    }
+
     @PostMapping("/add")
     public ResponseEntity<ItemResponse> addItem(@RequestBody RegisterItemRequest registerItemRequest) {
         try{
@@ -34,7 +39,7 @@ public class ItemController {
     @PostMapping("/remove")
     public HttpStatus removeItem(@RequestBody ItemRequest itemRequest) {
         try{
-            itemService.removeItemFromList(itemRequest,currentUserService.getCurrentUserNickname());
+            itemService.removeItemsFromRequest(itemRequest,currentUserService.getCurrentUserNickname());
             return HttpStatus.NO_CONTENT;
         }catch (AccessDeniedException e){
             return HttpStatus.FORBIDDEN;
