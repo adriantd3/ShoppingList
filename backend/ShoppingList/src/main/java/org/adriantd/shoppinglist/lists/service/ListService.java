@@ -22,7 +22,14 @@ public class ListService extends DTOService {
     private final ShopListRepository shopListRepository;
     private final UserRepository userRepository;
 
-    public List<ListInfoResponse> getListsInfo(List<Integer> ids){
+    public List<ListInfoResponse> getListsFromUser(Integer id){
+        User user = userRepository.findById(id).orElseThrow();
+        List<Shoplist> lists = shopListRepository.findAllByUser(user);
+
+        return entidadesADTO(lists);
+    }
+
+    public List<ListInfoResponse> getListsByIds(List<Integer> ids){
         List<Shoplist> lists = shopListRepository.findAllById(ids);
 
         return entidadesADTO(lists);

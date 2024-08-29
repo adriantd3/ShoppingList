@@ -21,6 +21,15 @@ public class ListController {
     private final ListService listService;
     private final CurrentUserService currentUserService;
 
+    @GetMapping("")
+    public ResponseEntity<List<ListInfoResponse>> getAllLists() {
+        try{
+            return ResponseEntity.ok(listService.getListsFromUser(currentUserService.getCurrentUserId()));
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+
     // GET /info?id=1,2,3,4,5
     @GetMapping("/info")
     public ResponseEntity<List<ListInfoResponse>> getListsInfo(@RequestParam("id") List<Integer> shoplistIds) {
@@ -28,9 +37,8 @@ public class ListController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity.ok(listService.getListsInfo(shoplistIds));
+        return ResponseEntity.ok(listService.getListsByIds(shoplistIds));
     }
-
 
 
     @DeleteMapping("/{id}")

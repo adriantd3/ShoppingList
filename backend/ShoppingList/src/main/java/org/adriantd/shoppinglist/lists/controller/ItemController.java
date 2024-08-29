@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,9 +21,9 @@ public class ItemController {
     private final ItemService itemService;
     private final CurrentUserService currentUserService;
 
-    @GetMapping("/{shoplistId}")
-    public ResponseEntity<ItemResponse> getListItems(@PathVariable int shoplistId) {
-        return null;
+    @GetMapping("/{id}")
+    public ResponseEntity<List<ItemResponse>> getListItems(@PathVariable int id) {
+        return ResponseEntity.ok(itemService.getAllItemsFromListId(id));
     }
 
     @PostMapping("/add")

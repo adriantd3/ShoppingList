@@ -13,6 +13,7 @@ import org.adriantd.shoppinglist.lists.entity.items.ItemId;
 import org.adriantd.shoppinglist.lists.entity.lists.Shoplist;
 import org.adriantd.shoppinglist.products.dao.ProductRepository;
 import org.adriantd.shoppinglist.products.entity.Product;
+import org.adriantd.shoppinglist.utils.DTOService;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
@@ -20,12 +21,18 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ItemService {
+public class ItemService extends DTOService {
 
     private final ItemRepository itemRepository;
     private final ShopListRepository shopListRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+
+    public List<ItemResponse> getAllItemsFromListId(Integer shoplistId) {
+        List<Item> items = itemRepository.findAllByShoppingListId(shoplistId);
+
+        return entidadesADTO(items);
+    }
 
     public ItemResponse addItemToList(RegisterItemRequest registerItemRequest, String nickname) throws Exception {
         Shoplist shoplist = shopListRepository.findById(registerItemRequest.getShoplistId()).orElseThrow();
