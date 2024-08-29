@@ -13,13 +13,14 @@ import java.util.Map;
 @Service
 public class JWTService {
 
-    private SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
+    private final SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
 
     public String getToken(UserDetails userDetails) {
         return this.getToken(new HashMap<String, Object>(), userDetails);
     }
 
     private String getToken(Map<String,Object> claims, UserDetails userDetails) {
+        System.out.println(SECRET_KEY.toString());
         return Jwts.builder()
                 .claims(claims)
                 .subject(userDetails.getUsername())

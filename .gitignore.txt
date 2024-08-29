@@ -1,3 +1,4 @@
 # Archivos basura de VisualParadigm
 
 Docs/*.vpp.bak*
+.env
