@@ -5,8 +5,11 @@ import org.adriantd.shoppinglist.auth.service.AuthService;
 import org.adriantd.shoppinglist.auth.dto.AuthResponse;
 import org.adriantd.shoppinglist.auth.dto.LoginRequest;
 import org.adriantd.shoppinglist.auth.dto.RegisterRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.sql.SQLIntegrityConstraintViolationException;
 
 @RestController
 @RequestMapping("/auth")
@@ -17,12 +20,20 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
-        return ResponseEntity.ok(authService.login(loginRequest));
+        try{
+            return ResponseEntity.ok(authService.login(loginRequest));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest registerRequest) {
-        return ResponseEntity.ok(authService.register(registerRequest));
+        try{
+            return ResponseEntity.ok(authService.register(registerRequest));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
 }
