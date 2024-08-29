@@ -76,13 +76,38 @@ public class ItemService extends DTOService {
 
     }
 
-    public void removeSingleItem(Integer shoplistId, Integer productId) throws Exception {
+    private void removeSingleItem(Integer shoplistId, Integer productId) throws Exception {
         ItemId itemId = new ItemId(shoplistId,productId);
         if(!isItemAlreadyExisting(itemId)) {
             throw new AccessDeniedException("LOG: Item does not exist");
         }
 
         itemRepository.deleteById(itemId);
+    }
+
+    public void updateItemsPurchased(ItemRequest itemRequest, String nickname) throws Exception {
+        User user = userRepository.findByNickname(nickname).orElseThrow();
+        Shoplist shoplist = shopListRepository.findById(itemRequest.getShoplistId()).orElseThrow();
+        if(!isUserAllowed(shoplist, user)) {
+            throw new AccessDeniedException("LOG: User not member or owner of the list");
+        }
+
+        Integer[] productIds = itemRequest.getProductIds();
+        for (Integer productId : productIds) {
+            updateSingleItemState(shoplist,productId);
+        }
+    }
+
+    private void updateSingleItemState(Shoplist shoplist, Integer productId) throws Exception {
+        ItemId itemId = new ItemId(shoplist.getId(),productId);
+        if(!isItemAlreadyExisting(itemId)) {
+            throw new AccessDeniedException("LOG: Item does not exist");
+        }
+
+        Item item = itemRepository.findById(itemId).orElse(null);
+        item.setPurchased(!item.getPurchased());
+
+        itemRepository.save(item);
     }
 
     /**

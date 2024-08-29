@@ -49,4 +49,16 @@ public class ItemController {
         }
     }
 
+    @PutMapping("/state")
+    public HttpStatus updateItemPurchasedState(@RequestBody ItemRequest itemRequest) {
+        try{
+            itemService.updateItemsPurchased(itemRequest, currentUserService.getCurrentUserNickname());
+            return HttpStatus.NO_CONTENT;
+        }catch (AccessDeniedException e){
+            return HttpStatus.FORBIDDEN;
+        }catch (Exception e){
+            return HttpStatus.NOT_FOUND;
+        }
+    }
+
 }
