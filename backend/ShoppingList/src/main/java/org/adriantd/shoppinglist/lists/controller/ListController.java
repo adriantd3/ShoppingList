@@ -23,11 +23,7 @@ public class ListController {
 
     @GetMapping("")
     public ResponseEntity<List<ListInfoResponse>> getAllLists() {
-        try{
-            return ResponseEntity.ok(listService.getListsFromUser(currentUserService.getCurrentUserId()));
-        } catch (AccessDeniedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+        return ResponseEntity.ok(listService.getListsFromUser(currentUserService.getCurrentUserId()));
     }
 
     // GET /info?id=1,2,3,4,5

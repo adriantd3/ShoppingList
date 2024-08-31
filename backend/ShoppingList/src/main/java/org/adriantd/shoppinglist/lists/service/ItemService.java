@@ -101,7 +101,7 @@ public class ItemService extends DTOService {
     private void updateSingleItemState(Shoplist shoplist, Integer productId) throws Exception {
         ItemId itemId = new ItemId(shoplist.getId(),productId);
         if(!isItemAlreadyExisting(itemId)) {
-            throw new AccessDeniedException("LOG: Item does not exist");
+            throw new Exception("LOG: Item does not exist");
         }
 
         Item item = itemRepository.findById(itemId).orElse(null);

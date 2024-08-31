@@ -18,19 +18,16 @@ public class CurrentUserService {
 
     private final UserRepository userRepository;
 
-    public UserDetails getCurrentUser() throws AccessDeniedException {
+    public UserDetails getCurrentUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null) {
-            throw new AccessDeniedException("LOG: No user authenticated");
-        }
         return (UserDetails) authentication.getPrincipal();
     }
 
-    public Integer getCurrentUserId() throws AccessDeniedException {
+    public Integer getCurrentUserId(){
         return userRepository.findByNickname(getCurrentUser().getUsername()).orElseThrow().getId();
     }
 
-    public String getCurrentUserNickname() throws AccessDeniedException {
+    public String getCurrentUserNickname(){
         return getCurrentUser().getUsername();
     }
 

@@ -30,7 +30,6 @@ public class JWTService {
     }
 
     private String getToken(Map<String,Object> claims, UserDetails userDetails) {
-        System.out.println(SECRET_KEY.toString());
         return Jwts.builder()
                 .claims(claims)
                 .subject(userDetails.getUsername())

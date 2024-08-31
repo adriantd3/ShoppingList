@@ -38,26 +38,29 @@ public class ItemController {
     }
 
     @PostMapping("/remove")
-    public HttpStatus removeItem(@RequestBody ItemRequest itemRequest) {
+    public ResponseEntity<Void> removeItem(@RequestBody ItemRequest itemRequest) {
         try{
             itemService.removeItemsFromRequest(itemRequest,currentUserService.getCurrentUserNickname());
-            return HttpStatus.NO_CONTENT;
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }catch (AccessDeniedException e){
-            return HttpStatus.FORBIDDEN;
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }catch (Exception e){
-            return HttpStatus.NOT_FOUND;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
     @PutMapping("/state")
-    public HttpStatus updateItemPurchasedState(@RequestBody ItemRequest itemRequest) {
+    public ResponseEntity<Void> updateItemPurchasedState(@RequestBody(required = false) ItemRequest itemRequest) {
+        if(itemRequest == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
         try{
             itemService.updateItemsPurchased(itemRequest, currentUserService.getCurrentUserNickname());
-            return HttpStatus.NO_CONTENT;
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }catch (AccessDeniedException e){
-            return HttpStatus.FORBIDDEN;
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }catch (Exception e){
-            return HttpStatus.NOT_FOUND;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
