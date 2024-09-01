@@ -3,6 +3,7 @@ package org.adriantd.shoppinglist.auth.jwt;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -47,14 +48,23 @@ public class JWTService {
         return getClaims(token).getSubject();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        String expectedUsername = userDetails.getUsername();
-        String actualUsername = getUsernameFromToken(token);
-        return expectedUsername.equals(actualUsername) && !isTokenExpired(token);
+    public boolean isTokenInvalid(String token, UserDetails userDetails) {
+        try{
+            String expectedUsername = userDetails.getUsername();
+            String actualUsername = getUsernameFromToken(token);
+            return !expectedUsername.equals(actualUsername);
+        }catch (RuntimeException e){
+            return true;
+        }
     }
 
     public boolean isTokenExpired(String token) {
-        Date expiration = getClaims(token).getExpiration();
-        return expiration.before(new Date());
+        try{
+            Date expiration = getClaims(token).getExpiration();
+            return expiration.before(new Date());
+        } catch (RuntimeException e) {
+            return true;
+        }
     }
+
 }

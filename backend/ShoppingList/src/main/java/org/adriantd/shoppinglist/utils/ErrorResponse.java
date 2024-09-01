@@ -6,12 +6,7 @@ import lombok.NonNull;
 @Data
 public class ErrorResponse {
     @NonNull
-    private String message;
+    private String error;
     @NonNull
-    private Integer statusCode;
-
-    @Override
-    public String toString() {
-        return String.format("ERROR %d: %s", statusCode, message);
-    }
+    private Integer status;
 }

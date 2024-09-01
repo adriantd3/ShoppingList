@@ -8,4 +8,7 @@ public class ExceptionMessage {
     public static final String USER_NOT_FOUND = "User not found";
     public static final String PRODUCT_NOT_FOUND = "Product not found";
     public static final String SHOP_LIST_NOT_FOUND = "Shop list not found";
+    public static final String JWT_TOKEN_REQUIRED = "Authentication token is required for this request";
+    public static final String INVALID_JWT_TOKEN = "Invalid authentication token";
+    public static final String JWT_TOKEN_EXPIRED = "Authentication token is expired, please login to get a new token";
 }
