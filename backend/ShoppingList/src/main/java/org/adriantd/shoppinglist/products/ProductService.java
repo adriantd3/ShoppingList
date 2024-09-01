@@ -8,8 +8,10 @@ import org.adriantd.shoppinglist.auth.entity.User;
 import org.adriantd.shoppinglist.products.dto.ProductRequest;
 import org.adriantd.shoppinglist.products.dto.ProductResponse;
 import org.adriantd.shoppinglist.utils.DTOService;
+import org.adriantd.shoppinglist.utils.ExceptionMessage;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ public class ProductService extends DTOService {
         return entidadesADTO(userProducts);
     }
 
+    @Transactional
     public ProductResponse registerProduct(ProductRequest productRequest, Integer userId) {
         User user = userRepository.findById(userId).orElseThrow();
 
@@ -49,11 +52,12 @@ public class ProductService extends DTOService {
         return newProduct.toDTO();
     }
 
+    @Transactional
     public void updateProduct(Integer id, ProductRequest productRequest, String nickname) {
         Product product = productRepository.findById(id).orElseThrow();
 
         if (!product.getUser().getNickname().equals(nickname)) {
-            throw new AccessDeniedException("User is not the owner of the product");
+            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_PRODUCT);
         }
 
         product.setName(productRequest.getName());
@@ -63,11 +67,12 @@ public class ProductService extends DTOService {
         productRepository.save(product);
     }
 
+    @Transactional
     public void deleteProduct(Integer id, String nickname) {
         Product product = productRepository.findById(id).orElseThrow();
 
         if (!product.getUser().getNickname().equals(nickname)) {
-            throw new AccessDeniedException("User is not the owner of the product");
+            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_PRODUCT);
         }
 
         productRepository.delete(product);

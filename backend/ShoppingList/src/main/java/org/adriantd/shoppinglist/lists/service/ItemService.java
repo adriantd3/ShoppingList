@@ -18,6 +18,7 @@ import org.adriantd.shoppinglist.utils.DTOService;
 import org.adriantd.shoppinglist.utils.ExceptionMessage;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -37,6 +38,7 @@ public class ItemService extends DTOService {
         return entidadesADTO(items);
     }
 
+    @Transactional
     public ItemResponse addItemToList(RegisterItemRequest registerItemRequest, String nickname){
         Shoplist shoplist = shopListRepository.findById(registerItemRequest.getShoplistId()).orElseThrow();
         User user = userRepository.findByNickname(nickname).orElseThrow();
@@ -66,6 +68,7 @@ public class ItemService extends DTOService {
         return item.toDTO();
     }
 
+    @Transactional
     public void removeItemsFromRequest(ItemRequest itemRequest, String nickname) {
         User user = userRepository.findByNickname(nickname).orElseThrow();
         Shoplist shoplist = shopListRepository.findById(itemRequest.getShoplistId()).orElseThrow();
@@ -89,6 +92,7 @@ public class ItemService extends DTOService {
         itemRepository.deleteById(itemId);
     }
 
+    @Transactional
     public void updateItemsPurchased(ItemRequest itemRequest, String nickname){
         User user = userRepository.findByNickname(nickname).orElseThrow();
         Shoplist shoplist = shopListRepository.findById(itemRequest.getShoplistId()).orElseThrow();
@@ -114,6 +118,7 @@ public class ItemService extends DTOService {
         itemRepository.save(item);
     }
 
+    @Transactional
     public void updateItem(@Valid RegisterItemRequest registerItemRequest, String nickname) {
         Shoplist shoplist = shopListRepository.findById(registerItemRequest.getShoplistId()).orElseThrow();
         User user = userRepository.findByNickname(nickname).orElseThrow();
