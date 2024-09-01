@@ -55,10 +55,9 @@ public class ProductService extends DTOService {
     @Transactional
     public void updateProduct(Integer id, ProductRequest productRequest, String nickname) {
         Product product = productRepository.findById(id).orElseThrow();
+        User user = userRepository.findByNickname(nickname).orElseThrow();
 
-        if (!product.getUser().getNickname().equals(nickname)) {
-            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_PRODUCT);
-        }
+        validateUserAuthorization(product,user);
 
         product.setName(productRequest.getName());
         product.setImage(productRequest.getImage());
@@ -70,11 +69,20 @@ public class ProductService extends DTOService {
     @Transactional
     public void deleteProduct(Integer id, String nickname) {
         Product product = productRepository.findById(id).orElseThrow();
+        User user = userRepository.findByNickname(nickname).orElseThrow();
 
-        if (!product.getUser().getNickname().equals(nickname)) {
-            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_PRODUCT);
-        }
+        validateUserAuthorization(product, user);
 
         productRepository.delete(product);
+    }
+
+    private boolean isUserOwner(Product product, User user){
+        return product.getUser().getId().equals(user.getId());
+    }
+
+    private void validateUserAuthorization(Product product, User user) {
+        if (!isUserOwner(product, user)) {
+            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_PRODUCT);
+        }
     }
 }

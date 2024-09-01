@@ -52,24 +52,35 @@ public class ListService extends DTOService {
 
     public void deleteShoplist(Integer id, Integer userId){
         Shoplist shoplist = shopListRepository.findById(id).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow();
 
-        if (!shoplist.getUserOwner().getId().equals(userId)) {
-            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_LIST);
-        }
+        validateUserAuthorization(shoplist, user);
 
         shopListRepository.delete(shoplist);
     }
 
     public void updateShoplist(Integer id, String name, Integer userId){
         Shoplist shoplist = shopListRepository.findById(id).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow();
 
-        if (!shoplist.getUserOwner().getId().equals(userId)) {
-            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_LIST);
-        }
+        validateUserAuthorization(shoplist, user);
 
         shoplist.setName(name);
 
         shopListRepository.save(shoplist);
     }
 
+    private boolean isUserOwner(Shoplist shoplist, User user){
+        return shoplist.getUserOwner().getId().equals(user.getId());
+    }
+
+    private boolean isUserMember(Shoplist shoplist, User user){
+        return shoplist.getUsers().contains(user);
+    }
+
+    private void validateUserAuthorization(Shoplist shoplist, User user) {
+        if (!isUserOwner(shoplist, user) && !isUserMember(shoplist, user)) {
+            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_LIST);
+        }
+    }
 }

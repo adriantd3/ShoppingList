@@ -43,16 +43,12 @@ public class ItemService extends DTOService {
         Shoplist shoplist = shopListRepository.findById(registerItemRequest.getShoplistId()).orElseThrow();
         User user = userRepository.findByNickname(nickname).orElseThrow();
 
-        if(!isUserAllowed(shoplist, user)) {
-            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_LIST);
-        }
+        validateUserAuthorization(shoplist, user);
 
         Product product = productRepository.findById(registerItemRequest.getProductId()).orElseThrow();
         ItemId itemId = new ItemId(shoplist.getId(),product.getId());
 
-        if(isItemAlreadyExisting(itemId)){
-            throw new AccessDeniedException(ExceptionMessage.ITEM_ALREADY_IN_LIST);
-        }
+        validateItemExistence(itemId);
 
         Item item = new Item();
         item.setId(itemId);
@@ -72,9 +68,7 @@ public class ItemService extends DTOService {
     public void removeItemsFromRequest(ItemRequest itemRequest, String nickname) {
         User user = userRepository.findByNickname(nickname).orElseThrow();
         Shoplist shoplist = shopListRepository.findById(itemRequest.getShoplistId()).orElseThrow();
-        if(!isUserAllowed(shoplist, user)) {
-            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_LIST);
-        }
+        validateUserAuthorization(shoplist, user);
 
         Integer[] productIds = itemRequest.getProductIds();
         for (Integer productId : productIds) {
@@ -85,9 +79,7 @@ public class ItemService extends DTOService {
 
     private void removeSingleItem(Integer shoplistId, Integer productId){
         ItemId itemId = new ItemId(shoplistId,productId);
-        if(!isItemAlreadyExisting(itemId)) {
-            throw new NoSuchElementException(ExceptionMessage.ITEM_NOT_FOUND);
-        }
+        validateItemExistence(itemId);
 
         itemRepository.deleteById(itemId);
     }
@@ -108,9 +100,7 @@ public class ItemService extends DTOService {
 
     private void updateSingleItemState(Shoplist shoplist, Integer productId)  {
         ItemId itemId = new ItemId(shoplist.getId(),productId);
-        if(!isItemAlreadyExisting(itemId)) {
-            throw new NoSuchElementException(ExceptionMessage.ITEM_NOT_FOUND);
-        }
+        validateItemExistence(itemId);
 
         Item item = itemRepository.findById(itemId).orElse(null);
         item.setPurchased(!item.getPurchased());
@@ -123,16 +113,12 @@ public class ItemService extends DTOService {
         Shoplist shoplist = shopListRepository.findById(registerItemRequest.getShoplistId()).orElseThrow();
         User user = userRepository.findByNickname(nickname).orElseThrow();
 
-        if(!isUserAllowed(shoplist, user)) {
-            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_LIST);
-        }
+        validateUserAuthorization(shoplist, user);
 
         Product product = productRepository.findById(registerItemRequest.getProductId()).orElseThrow();
         ItemId itemId = new ItemId(shoplist.getId(),product.getId());
 
-        if(!isItemAlreadyExisting(itemId)){
-            throw new NoSuchElementException(ExceptionMessage.ITEM_NOT_FOUND);
-        }
+        validateItemExistence(itemId);
 
         Item item = itemRepository.findById(itemId).orElseThrow();
         item.setUnits(registerItemRequest.getUnits());
@@ -140,6 +126,18 @@ public class ItemService extends DTOService {
 
         itemRepository.save(item);
 
+    }
+
+    private void validateUserAuthorization(Shoplist shoplist, User user) {
+        if(!isUserAllowed(shoplist, user)) {
+            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_LIST);
+        }
+    }
+
+    private void validateItemExistence(ItemId itemId) {
+        if(!isItemAlreadyExisting(itemId)) {
+            throw new NoSuchElementException(ExceptionMessage.ITEM_NOT_FOUND);
+        }
     }
 
     /**
