@@ -44,4 +44,10 @@ public class ItemController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<Void> updateItem(@Valid @RequestBody RegisterItemRequest registerItemRequest) {
+        itemService.updateItem(registerItemRequest, currentUserService.getCurrentUserNickname());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }

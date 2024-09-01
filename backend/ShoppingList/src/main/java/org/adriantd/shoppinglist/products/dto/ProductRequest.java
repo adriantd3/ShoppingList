@@ -1,5 +1,6 @@
 package org.adriantd.shoppinglist.products.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductRequest {
+    @NotNull
     String name;
+    @NotNull
     String image;
+    @NotNull
     String magnitude;
 }

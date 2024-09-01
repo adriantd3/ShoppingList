@@ -1,5 +1,6 @@
 package org.adriantd.shoppinglist.lists.service;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.adriantd.shoppinglist.auth.dao.UserRepository;
 import org.adriantd.shoppinglist.auth.entity.User;
@@ -14,6 +15,7 @@ import org.adriantd.shoppinglist.lists.entity.lists.Shoplist;
 import org.adriantd.shoppinglist.products.dao.ProductRepository;
 import org.adriantd.shoppinglist.products.entity.Product;
 import org.adriantd.shoppinglist.utils.DTOService;
+import org.adriantd.shoppinglist.utils.ExceptionMessage;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -40,13 +42,14 @@ public class ItemService extends DTOService {
         User user = userRepository.findByNickname(nickname).orElseThrow();
 
         if(!isUserAllowed(shoplist, user)) {
-            throw new AccessDeniedException("LOG: User not member or owner of the list");
+            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_LIST);
         }
 
         Product product = productRepository.findById(registerItemRequest.getProductId()).orElseThrow();
         ItemId itemId = new ItemId(shoplist.getId(),product.getId());
+
         if(isItemAlreadyExisting(itemId)){
-            throw new AccessDeniedException("Item is already in list");
+            throw new AccessDeniedException(ExceptionMessage.ITEM_ALREADY_IN_LIST);
         }
 
         Item item = new Item();
@@ -67,7 +70,7 @@ public class ItemService extends DTOService {
         User user = userRepository.findByNickname(nickname).orElseThrow();
         Shoplist shoplist = shopListRepository.findById(itemRequest.getShoplistId()).orElseThrow();
         if(!isUserAllowed(shoplist, user)) {
-            throw new AccessDeniedException("User not member or owner of the list");
+            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_LIST);
         }
 
         Integer[] productIds = itemRequest.getProductIds();
@@ -80,7 +83,7 @@ public class ItemService extends DTOService {
     private void removeSingleItem(Integer shoplistId, Integer productId){
         ItemId itemId = new ItemId(shoplistId,productId);
         if(!isItemAlreadyExisting(itemId)) {
-            throw new NoSuchElementException("Item does not exist");
+            throw new NoSuchElementException(ExceptionMessage.ITEM_NOT_FOUND);
         }
 
         itemRepository.deleteById(itemId);
@@ -90,7 +93,7 @@ public class ItemService extends DTOService {
         User user = userRepository.findByNickname(nickname).orElseThrow();
         Shoplist shoplist = shopListRepository.findById(itemRequest.getShoplistId()).orElseThrow();
         if(!isUserAllowed(shoplist, user)) {
-            throw new AccessDeniedException("User not member or owner of the list");
+            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_LIST);
         }
 
         Integer[] productIds = itemRequest.getProductIds();
@@ -102,13 +105,36 @@ public class ItemService extends DTOService {
     private void updateSingleItemState(Shoplist shoplist, Integer productId)  {
         ItemId itemId = new ItemId(shoplist.getId(),productId);
         if(!isItemAlreadyExisting(itemId)) {
-            throw new NoSuchElementException("LOG: Item does not exist");
+            throw new NoSuchElementException(ExceptionMessage.ITEM_NOT_FOUND);
         }
 
         Item item = itemRepository.findById(itemId).orElse(null);
         item.setPurchased(!item.getPurchased());
 
         itemRepository.save(item);
+    }
+
+    public void updateItem(@Valid RegisterItemRequest registerItemRequest, String nickname) {
+        Shoplist shoplist = shopListRepository.findById(registerItemRequest.getShoplistId()).orElseThrow();
+        User user = userRepository.findByNickname(nickname).orElseThrow();
+
+        if(!isUserAllowed(shoplist, user)) {
+            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_LIST);
+        }
+
+        Product product = productRepository.findById(registerItemRequest.getProductId()).orElseThrow();
+        ItemId itemId = new ItemId(shoplist.getId(),product.getId());
+
+        if(!isItemAlreadyExisting(itemId)){
+            throw new NoSuchElementException(ExceptionMessage.ITEM_NOT_FOUND);
+        }
+
+        Item item = itemRepository.findById(itemId).orElseThrow();
+        item.setUnits(registerItemRequest.getUnits());
+        item.setType(registerItemRequest.getType());
+
+        itemRepository.save(item);
+
     }
 
     /**
@@ -129,6 +155,5 @@ public class ItemService extends DTOService {
 
         return membersList.contains(user) || owner.equals(user);
     }
-
 
 }

@@ -4,10 +4,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.security.InvalidParameterException;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
@@ -18,6 +18,14 @@ public class GlobalExceptionHandler {
         String errorMessage = "Validation error: ";
         errorMessage += e.getFieldError().getField() + " " + e.getFieldError().getDefaultMessage();
 
+        ErrorResponse errorResponse = new ErrorResponse(errorMessage, 400);
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidParameterException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidParameterException(InvalidParameterException e) {
+        String errorMessage = "Invalid parameter: " + e.getMessage();
         ErrorResponse errorResponse = new ErrorResponse(errorMessage, 400);
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);

@@ -1,5 +1,6 @@
 package org.adriantd.shoppinglist.products;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.adriantd.shoppinglist.auth.service.CurrentUserService;
 import org.adriantd.shoppinglist.products.dto.ProductRequest;
@@ -29,37 +30,25 @@ public class ProductController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<ProductResponse>> getUserProducts() throws Exception{
+    public ResponseEntity<List<ProductResponse>> getUserProducts(){
         return ResponseEntity.ok(productService.getAllUserProducts(currentUserService.getCurrentUserId()));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ProductResponse> registerProduct(@RequestBody ProductRequest productRequest) throws Exception {
+    public ResponseEntity<ProductResponse> registerProduct(@RequestBody ProductRequest productRequest){
         return ResponseEntity.ok(productService.registerProduct(productRequest, currentUserService.getCurrentUserId()));
     }
 
     @PutMapping("/update/{id}")
-    public HttpStatus updateProduct(@PathVariable Integer id, @RequestBody ProductRequest productRequest){
-        try{
-            productService.updateProduct(id, productRequest, currentUserService.getCurrentUserNickname());
-            return HttpStatus.OK;
-        } catch (NoSuchElementException e) {
-            return HttpStatus.NOT_FOUND;
-        } catch (Exception e) {
-            return HttpStatus.FORBIDDEN;
-        }
+    public ResponseEntity<Void> updateProduct(@PathVariable Integer id, @Valid @RequestBody ProductRequest productRequest){
+        productService.updateProduct(id, productRequest, currentUserService.getCurrentUserNickname());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/delete/{id}")
     public HttpStatus deleteProduct(@PathVariable Integer id){
-        try{
-            productService.deleteProduct(id, currentUserService.getCurrentUserNickname());
-            return HttpStatus.NO_CONTENT;
-        } catch (NoSuchElementException e) {
-            return HttpStatus.NOT_FOUND;
-        } catch (Exception e) {
-            return HttpStatus.FORBIDDEN;
-        }
+        productService.deleteProduct(id, currentUserService.getCurrentUserNickname());
+        return HttpStatus.NO_CONTENT;
     }
 
 }

@@ -8,13 +8,12 @@ import org.adriantd.shoppinglist.auth.entity.User;
 import org.adriantd.shoppinglist.products.dto.ProductRequest;
 import org.adriantd.shoppinglist.products.dto.ProductResponse;
 import org.adriantd.shoppinglist.utils.DTOService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +23,7 @@ public class ProductService extends DTOService {
     private final UserRepository userRepository;
 
     public ProductResponse getProduct(Integer productId){
-        Product product = productRepository.findById(productId).orElseThrow(NoSuchElementException::new);
+        Product product = productRepository.findById(productId).orElseThrow();
 
         return product.toDTO();
     }
@@ -50,11 +49,11 @@ public class ProductService extends DTOService {
         return newProduct.toDTO();
     }
 
-    public void updateProduct(Integer id, ProductRequest productRequest, String nickname) throws Exception {
+    public void updateProduct(Integer id, ProductRequest productRequest, String nickname) {
         Product product = productRepository.findById(id).orElseThrow();
 
         if (!product.getUser().getNickname().equals(nickname)) {
-            throw new AccessDeniedException("LOG: User is not the owner of the product");
+            throw new AccessDeniedException("User is not the owner of the product");
         }
 
         product.setName(productRequest.getName());
@@ -64,11 +63,11 @@ public class ProductService extends DTOService {
         productRepository.save(product);
     }
 
-    public void deleteProduct(Integer id, String nickname) throws Exception {
-        Product product = productRepository.findById(id).orElseThrow(NoSuchElementException::new);
+    public void deleteProduct(Integer id, String nickname) {
+        Product product = productRepository.findById(id).orElseThrow();
 
         if (!product.getUser().getNickname().equals(nickname)) {
-            throw new AccessDeniedException("LOG: User is not the owner of the product");
+            throw new AccessDeniedException("User is not the owner of the product");
         }
 
         productRepository.delete(product);
