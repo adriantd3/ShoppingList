@@ -1,7 +1,9 @@
 package org.adriantd.shoppinglist.utils;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -45,6 +47,20 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(errorMessage, 403);
 
         return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        String jsonMessage = e.getMessage().startsWith("JSON parse error") ? "JSON parse error on 1 or more attributes" : "";
+
+        if(jsonMessage.isEmpty()) {
+            jsonMessage = e.getMessage();
+        }
+
+        String errorMessage = "Invalid request body: " + jsonMessage;
+        ErrorResponse errorResponse = new ErrorResponse(errorMessage, 400);
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
 }
