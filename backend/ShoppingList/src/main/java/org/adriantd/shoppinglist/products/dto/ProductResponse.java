@@ -13,7 +13,8 @@ public class ProductResponse {
     Integer id;
     String owner;
     String name;
+    Integer categoryId;
     String image;
-    String magnitude;
     String timestamp;
+    String description;
 }

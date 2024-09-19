@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.adriantd.shoppinglist.utils.DTO;
 import org.adriantd.shoppinglist.auth.entity.User;
 import org.adriantd.shoppinglist.products.dto.ProductResponse;
+import org.adriantd.shoppinglist.utils.DTO;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -36,18 +36,22 @@ public class Product implements Serializable, DTO<ProductResponse> {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category", nullable = false)
+    private Category category;
+
     @Lob
     @Column(name = "image")
     private String image;
 
-    @NotNull
-    @Lob
-    @Column(name = "magnitude", nullable = false)
-    private String magnitude;
-
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "timestamp")
     private Instant timestamp;
+
+    @Lob
+    @Column(name = "description")
+    private String description;
 
     @Override
     public ProductResponse toDTO() {
@@ -56,9 +60,10 @@ public class Product implements Serializable, DTO<ProductResponse> {
         productResponse.setId(this.id);
         productResponse.setOwner(this.user.getUsername());
         productResponse.setName(this.name);
+        productResponse.setCategoryId(this.category.getId());
         productResponse.setImage(this.image);
-        productResponse.setMagnitude(this.magnitude);
         productResponse.setTimestamp(this.timestamp.toString());
+        productResponse.setDescription(this.description);
 
         return productResponse;
     }

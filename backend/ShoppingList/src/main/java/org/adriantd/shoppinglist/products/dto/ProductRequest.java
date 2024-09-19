@@ -16,5 +16,7 @@ public class ProductRequest {
     @NotNull
     String image;
     @NotNull
-    String magnitude;
+    Integer categoryId;
+    @NotNull
+    String description;
 }
