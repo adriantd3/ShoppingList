@@ -42,12 +42,12 @@ export const Main = styled(YStack, {
 
 export const Title = styled(H1, {
   color: '#000',
-  size: '$12',
+  size: '$10',
 });
 
 export const Subtitle = styled(SizableText, {
   color: '#38434D',
-  size: '$9',
+  size: '$5',
 });
 
 export const Button = styled(ButtonTamagui, {
@@ -77,23 +77,23 @@ export const Button = styled(ButtonTamagui, {
 });
 
 const config = createTamagui({
-  light: {
-    color: {
-      background: 'gray',
-      text: 'black',
-    },
-  },
+
   defaultFont: 'body',
   animations,
+
   shouldAddPrefersColorThemes: true,
   themeClassNameOnRoot: true,
+
   shorthands,
+
   fonts: {
     body: bodyFont,
     heading: headingFont,
   },
+
   themes,
   tokens,
+  
   media: createMedia({
     xs: { maxWidth: 660 },
     sm: { maxWidth: 800 },

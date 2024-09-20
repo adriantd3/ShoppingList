@@ -2,17 +2,24 @@ import { Link, Tabs } from 'expo-router';
 
 import { HeaderButton } from '../../components/HeaderButton';
 import { TabBarIcon } from '../../components/TabBarIcon';
+import { useTheme } from 'tamagui';
+
 
 export default function TabLayout() {
+  const theme = useTheme();
+
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: 'black',
+        tabBarActiveTintColor: "blue",
+        tabBarStyle: {
+          backgroundColor: theme.green9.val,
+          height: 65,
+        }
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
           headerRight: () => (
             <Link href="/modal" asChild>
