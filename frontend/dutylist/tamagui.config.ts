@@ -42,7 +42,7 @@ export const Main = styled(YStack, {
 
 export const Title = styled(H1, {
   color: '#000',
-  size: '$10',
+  size: '$8',
 });
 
 export const Subtitle = styled(SizableText, {

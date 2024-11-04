@@ -32,7 +32,7 @@ export default function WelcomeScreen() {
         </Subtitle>
       </YStack>
       <YStack gap="$3">
-        <Link href='hola' asChild>
+        <Link href='/hola' asChild>
           <Button w="$15">
             Sign in
           </Button>

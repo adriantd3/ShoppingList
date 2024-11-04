@@ -30,7 +30,6 @@ export default function RootLayout() {
 
   return (
     <TamaguiProvider config={config}>
-      <Theme name="blue">
         {!authenticated ? (
           // LOGIN STACK
           <Stack>
@@ -43,7 +42,6 @@ export default function RootLayout() {
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
         )}
-      </Theme>
     </TamaguiProvider>
   );
 }

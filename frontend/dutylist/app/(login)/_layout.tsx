@@ -10,7 +10,12 @@ export default function LoginLayout() {
           presentation: 'modal',
         }}
       />
-      <Stack.Screen name="hola"/>
+      <Stack.Screen name="hola" options={{
+        headerTitle: 'Back',
+        headerShown: true,
+        presentation: 'modal',
+      }}/>
+      <Stack.Screen name='register'/>
     </Stack>
   );
 }
