@@ -1,18 +1,18 @@
-module.exports = function (api) {
-  api.cache(true);
-  const plugins = [];
+module.exports = function(api) {
+    api.cache(true);
 
-  plugins.push([
-    '@tamagui/babel-plugin',
-    {
-      components: ['tamagui'],
-      config: './tamagui.config.ts',
-    },
-  ]);
+    return {
+        presets: [["babel-preset-expo", {
+            jsxImportSource: "nativewind"
+        }], "nativewind/babel"],
 
-  return {
-    presets: ['babel-preset-expo'],
+        plugins: [["module-resolver", {
+            root: ["./"],
 
-    plugins,
-  };
+            alias: {
+                "@": "./",
+                "tailwind.config": "./tailwind.config.js"
+            }
+        }]]
+    };
 };
