@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native";
-import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
 	FormControlError,
@@ -13,6 +13,8 @@ import { Input, InputField } from "@/components/ui/input";
 import { VStack } from "@/components/ui/vstack";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
+import { Divider } from '@/components/ui/divider';
+import { HStack } from "@/components/ui/hstack";
 
 export default function LoginScreen() {
 	const insets = useSafeAreaInsets();
@@ -48,12 +50,12 @@ export default function LoginScreen() {
 				<Heading size="2xl">Log in to your account</Heading>
 				<Text>Don't have an account? Sign Up</Text>
 			</VStack>
-			<VStack space="md">
+			<VStack space="lg">
 				<FormControl isInvalid={error}>
 					<FormControlLabel>
 						<FormControlLabelText>Email</FormControlLabelText>
 					</FormControlLabel>
-					<Input variant="outline" size="md">
+					<Input variant="outline" size="xl">
 						<InputField value={email} onChangeText={setEmail} />
 					</Input>
 				</FormControl>
@@ -61,7 +63,7 @@ export default function LoginScreen() {
 					<FormControlLabel>
 						<FormControlLabelText>Password</FormControlLabelText>
 					</FormControlLabel>
-					<Input variant="outline" size="md">
+					<Input variant="outline" size="xl">
 						<InputField
 							value={password}
 							onChangeText={setPassword}
@@ -78,7 +80,7 @@ export default function LoginScreen() {
 					onPress={handleSubmit}
 					action="primary"
 					variant="solid"
-					size="lg"
+					size="xl"
 					isDisabled={status == "submitting"}
 				>
 					{status == "submitting" ? <ButtonSpinner /> : null}
@@ -87,6 +89,12 @@ export default function LoginScreen() {
 					</ButtonText>
 				</Button>
 			</VStack>
+			<Divider />
+			<Button action="primary" variant="outline" size="xl">
+				<ButtonText>
+					Continue with Google
+				</ButtonText>
+			</Button>
 		</VStack>
 	);
 }

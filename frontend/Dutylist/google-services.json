@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "675976201460",
+    "project_id": "dutylist-1383e",
+    "storage_bucket": "dutylist-1383e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675976201460:android:b7870c8e3bf221a3fbcaa1",
+        "android_client_info": {
+          "package_name": "com.dutylist"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYeLU5P9PfKHbS6r0Dzh3AHWmDRlvAYms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
