@@ -12,7 +12,7 @@ export default function RootLayout() {
 			<StatusBar style="auto" />
 			<Stack>
 				<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-				<Stack.Screen name="login" options={{ headerShown: false }} />
+				<Stack.Screen name="auth" options={{ headerShown: false }} />
 			</Stack>
 		</GluestackUIProvider>
 	);

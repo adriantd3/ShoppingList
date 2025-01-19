@@ -44,7 +44,7 @@ export default function WelcomeScreen() {
 				</Text>
 			</VStack>
 			<VStack space="lg" style={styles.buttons}>
-				<Link href='/hola' asChild>
+				<Link href='auth/hola' asChild>
 					<Button
 						action={"primary"}
 						variant={"solid"}

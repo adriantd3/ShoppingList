@@ -6,7 +6,7 @@ import { Button, ButtonText } from '@/components/ui/button';
 const HomePage = () => {
     return (
         <View style={styles.container}>
-            <Link href="/login">Go to Login</Link>
+            <Link href="/auth">Go to Login</Link>
             <Text style={styles.text}>Hello, I am home</Text>
             <Button>
                 <ButtonText>Click me</ButtonText>
