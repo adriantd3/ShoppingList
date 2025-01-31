@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Button, ButtonText } from "@/components/ui/button";
 import ListCard from "@/components/home/list-card";
 import ListItemCard from "@/components/lists/list-item-card";
+import ProductItem from "@/components/products/product-item";
 
 const HomePage = () => {
 	const [timesPressed, setTimesPressed] = useState(0);
@@ -19,6 +20,7 @@ const HomePage = () => {
 		<View style={styles.container}>
 			<ListCard />
 			<ListItemCard />
+			<ProductItem />
 			<Link href="/auth">Go to Login</Link>
 			<Text style={styles.text}>Hello, I am home</Text>
 			<Button>

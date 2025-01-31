@@ -24,7 +24,7 @@ const ListItemCard = (item, state) => {
 	};
 
 	return (
-		<Pressable onPressIn={onPressIn} onPressOut={onPressOut}>
+		<Pressable onPressIn={onPressIn} onPressOut={onPressOut} className="w-full">
 			<Animated.View
 				style={[
 					styles.cardShape,
