@@ -8,7 +8,10 @@ import {
 	AvatarGroup,
 	AvatarImage,
 } from "@/components/ui/avatar";
+import { Icon, ThreeDotsIcon } from "@/components/ui/icon";
 import { useState, useRef } from "react";
+
+import { onPressInCard, onPressOutCard } from "../utils/animations";
 
 const ListCard = (list) => {
 	const [active, setActive] = useState(false);
@@ -16,20 +19,12 @@ const ListCard = (list) => {
 
 	const onPressIn = () => {
 		setActive(true);
-		Animated.timing(scaleValue, {
-			toValue: 0.95,
-			duration: 150, // Duración en milisegundos
-			useNativeDriver: true,
-		}).start();
+		onPressInCard(scaleValue);
 	};
 
 	const onPressOut = () => {
 		setActive(false);
-		Animated.timing(scaleValue, {
-			toValue: 1,
-			duration: 150, // Duración en milisegundos
-			useNativeDriver: true,
-		}).start();
+		onPressOutCard(scaleValue);
 	};
 
 	const avatars = [
@@ -69,10 +64,13 @@ const ListCard = (list) => {
 					active && styles.pressedCard,
 				]}
 			>
-				<View>
+				<View style={styles.itemsGroup}>
 					<Text size="3xl" style={styles.titleStyle} numberOfLines={1} bold>
 						List title
 					</Text>
+					<Pressable onPress={() => console.log("More options")}>
+						<Icon as={ThreeDotsIcon} size="xl" style={styles.titleStyle} />
+					</Pressable>
 				</View>
 
 				<View style={styles.itemsGroup}>
@@ -110,13 +108,13 @@ const styles = StyleSheet.create({
 		padding: 15,
 	},
 	pressedCard: {
-        filter: "brightness(0.95)",
+		filter: "brightness(0.95)",
 	},
 	itemsGroup: {
 		paddingStart: 10,
 		flexDirection: "row",
 		justifyContent: "space-between",
-		alignItems: "flex-end",
+		alignItems: "center",
 	},
 	titleStyle: {
 		color: "white",
