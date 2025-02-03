@@ -1,76 +1,111 @@
 import { Link } from "expo-router";
-import { useState } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, ButtonText } from "@/components/ui/button";
-import ListCard from "@/components/home/list-card";
+import { Heading } from "@/components/ui/heading";
+import { List } from "@/components/lists/types/List.types";
+import { FlashList } from "@shopify/flash-list";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import {
+	BottomSheetModal,
+	BottomSheetView,
+	BottomSheetModalProvider,
+	BottomSheetBackdrop
+} from "@gorhom/bottom-sheet";
+
+import ListCard from "@/components/lists/list-card";
 import ListItemCard from "@/components/lists/list-item-card";
 import ProductItem from "@/components/products/product-item";
 
 const HomePage = () => {
-	const [timesPressed, setTimesPressed] = useState(0);
+	const insets = useSafeAreaInsets();
+	const [selectedList, setSelectedList] = useState<List | null>(null);
+	const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-	let textLog = "";
-	if (timesPressed > 1) {
-		textLog = timesPressed + "x onPress";
-	} else if (timesPressed > 0) {
-		textLog = "onPress";
-	}
+	const initialLists: List[] = Array.from({ length: 20 }, (_, i) => ({
+		id: (i + 1).toString(),
+		name: `List ${i + 1}`,
+		n_items: Math.floor(Math.random() * 20) + 1,
+		avatars: [
+			"https://i.pinimg.com/236x/34/22/2a/34222a8f0d41c9158729fe194a789268.jpg",
+			"https://static1.personality-database.com/profile_images/02779f99c78745ceb5f3216b666328aa.png",
+		],
+		style: "default",
+	}));
+
+	const openOptionsModal = (list: List) => {
+		setSelectedList(list);
+		bottomSheetModalRef.current?.present();
+	};
+
+	const snapPoints = useMemo(() => ['40%'], []);
+
+    const handleDismiss = useCallback(() => {
+        setSelectedList(null);
+    }, []);
+
+	const styles = StyleSheet.create({
+		container: {
+			flex: 1,
+			paddingTop: insets.top + 10,
+			paddingLeft: 24,
+			paddingRight: 24,
+			paddingBottom: insets.bottom,
+			justifyContent: "flex-start",
+			backgroundColor: "#fff",
+		},
+		header: {
+			paddingBottom: 15,
+		},
+		modal: {
+			flex: 1,
+			alignItems: "center",
+		},
+	});
 
 	return (
-		<View style={styles.container}>
-			<ListCard />
-			<ListItemCard />
-			<ProductItem />
-			<Link href="/auth">Go to Login</Link>
-			<Text style={styles.text}>Hello, I am home</Text>
-			<Button>
-				<ButtonText>Click me</ButtonText>
-			</Button>
-			<Pressable
-				onPress={() => {
-					setTimesPressed((current) => current + 1);
-				}}
-				style={({ pressed }) => [
-					{
-						backgroundColor: pressed ? "rgb(210, 230, 255)" : "white",
-					},
-					styles.wrapperCustom,
-				]}
-			>
-				{({ pressed }) => (
-					<Text style={styles.text}>{pressed ? "Pressed!" : "Press Me"}</Text>
-				)}
-			</Pressable>
-		</View>
+		<GestureHandlerRootView style={styles.container}>
+			<BottomSheetModalProvider>
+				<FlashList
+					ListHeaderComponent={
+						<Heading size="3xl" style={styles.header}>
+							My shopping lists
+						</Heading>
+					}
+					data={initialLists}
+					renderItem={({ item }) => (
+						<ListCard
+							list={item}
+							manageOptions={() => {
+								openOptionsModal(item);
+							}}
+						/>
+					)}
+					estimatedItemSize={10}
+					keyExtractor={(item) => item.id}
+				/>
+				<BottomSheetModal
+                    ref={bottomSheetModalRef}
+                    stackBehavior="push"
+                    snapPoints={snapPoints}
+                    backdropComponent={props => (
+                        <BottomSheetBackdrop
+                            {...props}
+                            disappearsOnIndex={-1}
+                            appearsOnIndex={0}
+                            pressBehavior="close"
+                        />
+                    )}
+                    onDismiss={handleDismiss}
+                >
+                    <BottomSheetView style={styles.modal}>
+                        <Text>{selectedList?.name}</Text>
+                    </BottomSheetView>
+                </BottomSheetModal>
+			</BottomSheetModalProvider>
+		</GestureHandlerRootView>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		padding: 10,
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "#fff",
-	},
-	pressable: {
-		backgroundColor: "blue",
-		width: 100,
-	},
-	pressablePressed: {
-		backgroundColor: "red",
-	},
-	text: {
-		fontSize: 20,
-		fontWeight: "bold",
-	},
-	textPressed: {
-		color: "red",
-	},
-	wrapperCustom: {
-		borderRadius: 8,
-		padding: 6,
-	},
-});
 
 export default HomePage;
