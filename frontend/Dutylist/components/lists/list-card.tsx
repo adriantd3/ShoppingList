@@ -9,11 +9,16 @@ import {
 	AvatarImage,
 } from "@/components/ui/avatar";
 import { Icon, ThreeDotsIcon } from "@/components/ui/icon";
-import { useState, useRef } from "react";
-
+import React, { useState, useRef } from "react";
 import { onPressInCard, onPressOutCard } from "../utils/animations";
+import { List } from "./types/List.types";
 
-const ListCard = (list) => {
+interface ListCardProps {
+	list: List;
+	manageOptions?: () => void;
+}
+
+const ListCard: React.FC<ListCardProps> = ({ list, manageOptions: manageOptions }) => {
 	const [active, setActive] = useState(false);
 	const scaleValue = useRef(new Animated.Value(1)).current;
 
@@ -27,35 +32,15 @@ const ListCard = (list) => {
 		onPressOutCard(scaleValue);
 	};
 
-	const avatars = [
-		{
-			src: "https://i.pinimg.com/236x/34/22/2a/34222a8f0d41c9158729fe194a789268.jpg",
-		},
-		{
-			src: "https://static1.personality-database.com/profile_images/02779f99c78745ceb5f3216b666328aa.png",
-		},
-		{
-			src: "https://i.pinimg.com/236x/34/22/2a/34222a8f0d41c9158729fe194a789268.jpg",
-		},
-		{
-			src: "https://static1.personality-database.com/profile_images/02779f99c78745ceb5f3216b666328aa.png",
-		},
-		{
-			src: "https://i.pinimg.com/236x/34/22/2a/34222a8f0d41c9158729fe194a789268.jpg",
-		},
-		{
-			src: "https://static1.personality-database.com/profile_images/02779f99c78745ceb5f3216b666328aa.png",
-		},
-	];
-	const itemsCount = 12;
-	const extraAvatars = avatars.slice(4);
+	const extraAvatars = list.avatars.slice(4);
 	const remainingCount = extraAvatars.length;
 
 	return (
 		<Pressable
-			onPress={() => console.log("Press detected")}
+			onPress={() => console.log(`Pressed ${list.name}`)}
 			onPressIn={onPressIn}
 			onPressOut={onPressOut}
+			onLongPress={manageOptions}
 		>
 			<Animated.View
 				style={[
@@ -66,30 +51,34 @@ const ListCard = (list) => {
 			>
 				<View style={styles.itemsGroup}>
 					<Text size="3xl" style={styles.titleStyle} numberOfLines={1} bold>
-						List title
+						{list.name}
 					</Text>
-					<Pressable onPress={() => console.log("More options")}>
+					<Pressable onPress={manageOptions}>
 						<Icon as={ThreeDotsIcon} size="xl" style={styles.titleStyle} />
 					</Pressable>
 				</View>
 
 				<View style={styles.itemsGroup}>
 					<AvatarGroup>
-						{avatars.slice(0, 4).map((avatar, index) => {
-							return (
+						{list.avatars.slice(0,4)
+							.map((avatar, index) => (
 								<Avatar key={index} size="md">
-									<AvatarImage source={{ uri: avatar.src }} />
+									<AvatarImage source={{ uri: avatar }} />
 								</Avatar>
-							);
-						})}
-						{remainingCount > 0 && (
-							<Avatar size="md">
-								<AvatarFallbackText>{"+ " + remainingCount}</AvatarFallbackText>
-							</Avatar>
-						)}
+							))
+							.concat(
+								remainingCount > 0
+									? [
+											<Avatar key="extra" size="md">
+												<AvatarFallbackText>{`+ ${remainingCount}`}</AvatarFallbackText>
+											</Avatar>,
+									  ]
+									: []
+							)}
 					</AvatarGroup>
+
 					<Text style={styles.subTitleStyle} numberOfLines={1} bold>
-						{itemsCount} items
+						{list.n_items} items
 					</Text>
 				</View>
 			</Animated.View>
@@ -106,6 +95,7 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		backgroundColor: "lightblue",
 		padding: 15,
+		marginBottom: 10,
 	},
 	pressedCard: {
 		filter: "brightness(0.95)",
