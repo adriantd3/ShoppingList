@@ -4,6 +4,17 @@ import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import { EditIcon, TrashIcon, ShareIcon } from "@/components/ui/icon";
+import {
+	Actionsheet,
+	ActionsheetContent,
+	ActionsheetItem,
+	ActionsheetItemText,
+	ActionsheetDragIndicator,
+	ActionsheetDragIndicatorWrapper,
+	ActionsheetBackdrop,
+	ActionsheetIcon,
+} from "@/components/ui/actionsheet";
 import { List } from "@/components/lists/types/List.types";
 import { FlashList } from "@shopify/flash-list";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -11,17 +22,17 @@ import {
 	BottomSheetModal,
 	BottomSheetView,
 	BottomSheetModalProvider,
-	BottomSheetBackdrop
+	BottomSheetBackdrop,
 } from "@gorhom/bottom-sheet";
 
 import ListCard from "@/components/lists/list-card";
-import ListItemCard from "@/components/lists/list-item-card";
-import ProductItem from "@/components/products/product-item";
 
 const HomePage = () => {
 	const insets = useSafeAreaInsets();
 	const [selectedList, setSelectedList] = useState<List | null>(null);
-	const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+	const [showActionsheet, setShowActionsheet] = useState(false);
+
+	const snapPoints = useMemo(() => [30], []);
 
 	const initialLists: List[] = Array.from({ length: 20 }, (_, i) => ({
 		id: (i + 1).toString(),
@@ -34,16 +45,27 @@ const HomePage = () => {
 		style: "default",
 	}));
 
+	const renameList = () => {
+		console.log("List renamed");
+	}
+
+	const shareList = () => {
+		console.log("List shared");
+	}
+
+	const deleteList = () => {
+		console.log("List deleted");
+	}	
+
 	const openOptionsModal = (list: List) => {
 		setSelectedList(list);
-		bottomSheetModalRef.current?.present();
+		setShowActionsheet(true);
 	};
 
-	const snapPoints = useMemo(() => ['40%'], []);
-
-    const handleDismiss = useCallback(() => {
-        setSelectedList(null);
-    }, []);
+	const handleDismiss = useCallback(() => {
+		setSelectedList(null);
+		setShowActionsheet(false);
+	}, []);
 
 	const styles = StyleSheet.create({
 		container: {
@@ -53,7 +75,6 @@ const HomePage = () => {
 			paddingRight: 24,
 			paddingBottom: insets.bottom,
 			justifyContent: "flex-start",
-			backgroundColor: "#fff",
 		},
 		header: {
 			paddingBottom: 15,
@@ -65,46 +86,50 @@ const HomePage = () => {
 	});
 
 	return (
-		<GestureHandlerRootView style={styles.container}>
-			<BottomSheetModalProvider>
-				<FlashList
-					ListHeaderComponent={
-						<Heading size="3xl" style={styles.header}>
-							My shopping lists
-						</Heading>
-					}
-					data={initialLists}
-					renderItem={({ item }) => (
-						<ListCard
-							list={item}
-							manageOptions={() => {
-								openOptionsModal(item);
-							}}
-						/>
-					)}
-					estimatedItemSize={10}
-					keyExtractor={(item) => item.id}
-				/>
-				<BottomSheetModal
-                    ref={bottomSheetModalRef}
-                    stackBehavior="push"
-                    snapPoints={snapPoints}
-                    backdropComponent={props => (
-                        <BottomSheetBackdrop
-                            {...props}
-                            disappearsOnIndex={-1}
-                            appearsOnIndex={0}
-                            pressBehavior="close"
-                        />
-                    )}
-                    onDismiss={handleDismiss}
-                >
-                    <BottomSheetView style={styles.modal}>
-                        <Text>{selectedList?.name}</Text>
-                    </BottomSheetView>
-                </BottomSheetModal>
-			</BottomSheetModalProvider>
-		</GestureHandlerRootView>
+		<View style={styles.container} className="bg-background-50">
+			<FlashList
+				ListHeaderComponent={
+					<Heading size="3xl" style={styles.header}>
+						My shopping lists
+					</Heading>
+				}
+				data={initialLists}
+				renderItem={({ item }) => (
+					<ListCard
+						list={item}
+						manageOptions={() => {
+							openOptionsModal(item);
+						}}
+					/>
+				)}
+				estimatedItemSize={10}
+				keyExtractor={(item) => item.id}
+			/>
+			<Actionsheet
+				isOpen={showActionsheet}
+				onClose={handleDismiss}
+				snapPoints={snapPoints}
+			>
+				<ActionsheetBackdrop />
+				<ActionsheetContent>
+					<ActionsheetDragIndicatorWrapper>
+						<ActionsheetDragIndicator />
+					</ActionsheetDragIndicatorWrapper>
+					<ActionsheetItem onPress={renameList}>
+						<ActionsheetIcon as={EditIcon} size="lg" />
+						<ActionsheetItemText>Rename list</ActionsheetItemText>
+					</ActionsheetItem>
+					<ActionsheetItem onPress={shareList}>
+						<ActionsheetIcon as={ShareIcon} size="lg" />
+						<ActionsheetItemText>Share list</ActionsheetItemText>
+					</ActionsheetItem>
+					<ActionsheetItem onPress={deleteList}>
+						<ActionsheetIcon as={TrashIcon} size="lg" />
+						<ActionsheetItemText>Delete list</ActionsheetItemText>
+					</ActionsheetItem>
+				</ActionsheetContent>
+			</Actionsheet>
+		</View>
 	);
 };
 
