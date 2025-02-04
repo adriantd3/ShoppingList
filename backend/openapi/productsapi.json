@@ -1,0 +1,392 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ProductsAPI",
+    "description": "Microservice that manages all product related operations",
+    "termsOfService": "",
+    "contact": {
+      "email": ""
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "0.1"
+  },
+  "externalDocs": {
+    "description": "Find out more about spec",
+    "url": ""
+  },
+  "servers": [],
+  "tags": [
+    {
+      "name": "Default",
+      "description": "Endpoints available from API Gateway"
+    },
+    {
+      "name": "Internal",
+      "description": "Endpoints that are called from other internal microservices",
+      "externalDocs": {
+        "description": "",
+        "url": ""
+      }
+    }
+  ],
+  "paths": {
+    "/products": {
+      "get": {
+        "summary": "Retrieves user's products",
+        "description": "",
+        "operationId": "search_products",
+        "tags": [
+          "Default"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ProductListResponse"
+          },
+          "401": {
+            "description": "User ID is mandatory to access this resource",
+            "content": {},
+            "headers": {}
+          },
+          "403": {
+            "description": "You do not have permission to access this resource",
+            "content": {},
+            "headers": {}
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new product",
+        "description": "",
+        "operationId": "post_product",
+        "tags": [
+          "Default"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ProductResponse"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {},
+            "headers": {}
+          },
+          "401": {
+            "description": "User ID is mandatory to access this resource",
+            "content": {},
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "$ref": "#/components/requestBodies/NewProduct"
+        }
+      },
+      "parameters": [
+        {
+          "in": "header",
+          "name": "user_id",
+          "description": "The user caller's ID",
+          "schema": {
+            "type": "integer"
+          },
+          "required": true
+        }
+      ]
+    },
+    "/products/{id}": {
+      "get": {
+        "summary": "Retrieve a product",
+        "description": "",
+        "operationId": "get_product",
+        "tags": [
+          "Default"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "user_id",
+            "description": "The user caller's ID",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ProductResponse"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {},
+            "headers": {}
+          },
+          "401": {
+            "description": "User ID is mandatory to access this resource",
+            "content": {},
+            "headers": {}
+          },
+          "403": {
+            "description": "You do not have permission to access this resource",
+            "content": {},
+            "headers": {}
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {},
+            "headers": {}
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a product",
+        "description": "",
+        "operationId": "put_product",
+        "tags": [
+          "Default"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "user_id",
+            "description": "The user caller's ID",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ProductResponse"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {},
+            "headers": {}
+          },
+          "401": {
+            "description": "User ID is mandatory to access this resource",
+            "content": {},
+            "headers": {}
+          },
+          "403": {
+            "description": "You do not have permission to access this resource",
+            "content": {},
+            "headers": {}
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {},
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "$ref": "#/components/requestBodies/NewProduct"
+        }
+      },
+      "delete": {
+        "summary": "Delete a product",
+        "description": "",
+        "operationId": "delete_product",
+        "tags": [
+          "Default"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "user_id",
+            "description": "The user caller's ID",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {},
+            "headers": {}
+          },
+          "401": {
+            "description": "User ID is mandatory to access this resource",
+            "content": {},
+            "headers": {}
+          },
+          "403": {
+            "description": "You do not have permission to access this resource",
+            "content": {},
+            "headers": {}
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {},
+            "headers": {}
+          }
+        }
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "head": {
+        "summary": "Check a product exists",
+        "description": "",
+        "operationId": "check_product",
+        "tags": [
+          "Internal"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {},
+            "headers": {}
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {},
+            "headers": {}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "NewProduct": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "category_id": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "image",
+          "category_id",
+          "description"
+        ]
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/UserInfo"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category_id": {
+            "type": "integer"
+          },
+          "image": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "owner",
+          "name",
+          "category_id",
+          "image",
+          "description",
+          "field_0"
+        ]
+      },
+      "UserInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "image"
+        ]
+      }
+    },
+    "securitySchemes": {},
+    "requestBodies": {
+      "NewProduct": {
+        "required": false,
+        "description": "Request body for creating a new Product",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/NewProduct"
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "ProductResponse": {
+        "description": "",
+        "headers": {},
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Product"
+            }
+          }
+        }
+      },
+      "ProductListResponse": {
+        "description": "",
+        "headers": {},
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Product"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
