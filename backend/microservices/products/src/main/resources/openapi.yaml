@@ -1,0 +1,358 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: ""
+  description: Microservice that manages all product related operations
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: ""
+  title: ProductsAPI
+  version: "0.1"
+externalDocs:
+  description: Find out more about spec
+  url: ""
+servers:
+- url: /
+tags:
+- description: Endpoints available from API Gateway
+  name: Default
+- description: Endpoints that are called from other internal microservices
+  externalDocs:
+    description: ""
+    url: ""
+  name: Internal
+paths:
+  /products:
+    get:
+      description: ""
+      operationId: search_products
+      parameters:
+      - description: The user caller's ID
+        explode: false
+        in: header
+        name: user_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Product'
+                type: array
+          description: ""
+        "401":
+          content: {}
+          description: User ID is mandatory to access this resource
+        "403":
+          content: {}
+          description: You do not have permission to access this resource
+      summary: Retrieves user's products
+      tags:
+      - Default
+      x-accepts:
+      - application/json
+      x-tags:
+      - tag: Default
+    post:
+      description: ""
+      operationId: post_product
+      parameters:
+      - description: The user caller's ID
+        explode: false
+        in: header
+        name: user_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/NewProduct'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ""
+        "400":
+          content: {}
+          description: Bad Request
+        "401":
+          content: {}
+          description: User ID is mandatory to access this resource
+      summary: Create a new product
+      tags:
+      - Default
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+      x-tags:
+      - tag: Default
+  /products/{id}:
+    delete:
+      description: ""
+      operationId: delete_product
+      parameters:
+      - description: ""
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The user caller's ID
+        explode: false
+        in: header
+        name: user_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: ""
+        "400":
+          content: {}
+          description: Bad Request
+        "401":
+          content: {}
+          description: User ID is mandatory to access this resource
+        "403":
+          content: {}
+          description: You do not have permission to access this resource
+        "404":
+          content: {}
+          description: Product not found
+      summary: Delete a product
+      tags:
+      - Default
+      x-accepts:
+      - application/json
+      x-tags:
+      - tag: Default
+    get:
+      description: ""
+      operationId: get_product
+      parameters:
+      - description: ""
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The user caller's ID
+        explode: false
+        in: header
+        name: user_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ""
+        "400":
+          content: {}
+          description: Bad Request
+        "401":
+          content: {}
+          description: User ID is mandatory to access this resource
+        "403":
+          content: {}
+          description: You do not have permission to access this resource
+        "404":
+          content: {}
+          description: Product not found
+      summary: Retrieve a product
+      tags:
+      - Default
+      x-accepts:
+      - application/json
+      x-tags:
+      - tag: Default
+    head:
+      description: ""
+      operationId: check_product
+      parameters:
+      - description: ""
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "400":
+          content: {}
+          description: Bad Request
+        "404":
+          content: {}
+          description: Product not found
+      summary: Check a product exists
+      tags:
+      - Internal
+      x-accepts:
+      - application/json
+      x-tags:
+      - tag: Internal
+    put:
+      description: ""
+      operationId: put_product
+      parameters:
+      - description: ""
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The user caller's ID
+        explode: false
+        in: header
+        name: user_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/NewProduct'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ""
+        "400":
+          content: {}
+          description: Bad Request
+        "401":
+          content: {}
+          description: User ID is mandatory to access this resource
+        "403":
+          content: {}
+          description: You do not have permission to access this resource
+        "404":
+          content: {}
+          description: Product not found
+      summary: Update a product
+      tags:
+      - Default
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+      x-tags:
+      - tag: Default
+components:
+  requestBodies:
+    NewProduct:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NewProduct'
+      description: Request body for creating a new Product
+      required: false
+  responses:
+    ProductResponse:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Product'
+      description: ""
+    ProductListResponse:
+      content:
+        application/json:
+          schema:
+            items:
+              $ref: '#/components/schemas/Product'
+            type: array
+      description: ""
+  schemas:
+    NewProduct:
+      example:
+        image: image
+        category_id: 0
+        name: name
+        description: description
+      properties:
+        name:
+          type: string
+        image:
+          type: string
+        category_id:
+          type: integer
+        description:
+          type: string
+      required:
+      - category_id
+      - description
+      - image
+      - name
+      type: object
+    Product:
+      example:
+        owner:
+          image: image
+          id: 0
+          username: username
+        image: image
+        category_id: 6
+        name: name
+        description: description
+        id: id
+      properties:
+        id:
+          type: string
+        owner:
+          $ref: '#/components/schemas/UserInfo'
+        name:
+          type: string
+        category_id:
+          type: integer
+        image:
+          type: string
+        description:
+          type: string
+      required:
+      - category_id
+      - description
+      - field_0
+      - id
+      - image
+      - name
+      - owner
+      type: object
+    UserInfo:
+      example:
+        image: image
+        id: 0
+        username: username
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        image:
+          type: string
+      required:
+      - id
+      - image
+      - username
+      type: object
+  securitySchemes: {}
