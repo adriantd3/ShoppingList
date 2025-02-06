@@ -5,8 +5,8 @@
  */
 package org.openapitools.api;
 
-import org.openapitools.dto.NewProduct;
-import org.openapitools.dto.Product;
+import org.openapitools.model.NewProduct;
+import org.openapitools.model.Product;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -15,27 +15,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.NativeWebRequest;
 
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+
 import java.util.List;
-import java.util.Optional;
-import javax.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-05T18:53:31.285160+01:00[Europe/Madrid]", comments = "Generator version: 7.9.0")
+
 @Validated
 @Tag(name = "Internal", description = "Endpoints that are called from other internal microservices")
 public interface ProductsApi {
-
-    default Optional<NativeWebRequest> getRequest() {
-        return Optional.empty();
-    }
 
     /**
      * HEAD /products/{id} : Check a product exists
@@ -51,22 +43,18 @@ public interface ProductsApi {
             description = "",
             tags = {"Internal"},
             responses = {
-                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "204", description = ""),
                     @ApiResponse(responseCode = "400", description = "Bad Request"),
-                    @ApiResponse(responseCode = "404", description = "Product not found")
+                    @ApiResponse(responseCode = "404", description = "")
             }
     )
     @RequestMapping(
             method = RequestMethod.HEAD,
             value = "/products/{id}"
     )
-
-    default ResponseEntity<Void> checkProduct(
-            @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
-    ) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
+    public ResponseEntity<Void> checkProduct(
+            @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") Integer id
+    );
 
 
     /**
@@ -98,13 +86,10 @@ public interface ProductsApi {
             value = "/products/{id}"
     )
 
-    default ResponseEntity<Void> deleteProduct(
-            @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+    public ResponseEntity<Void> deleteProduct(
+            @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") Integer id,
             @NotNull @Parameter(name = "user_id", description = "The user caller's ID", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "user_id", required = true) Integer userId
-    ) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
+    );
 
 
     /**
@@ -139,22 +124,10 @@ public interface ProductsApi {
             produces = {"application/json"}
     )
 
-    default ResponseEntity<Product> getProduct(
-            @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+    public ResponseEntity<Product> getProduct(
+            @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") Integer id,
             @NotNull @Parameter(name = "user_id", description = "The user caller's ID", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "user_id", required = true) Integer userId
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"owner\" : { \"image\" : \"image\", \"id\" : 0, \"username\" : \"username\" }, \"image\" : \"image\", \"category_id\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
+    );
 
 
     /**
@@ -186,22 +159,10 @@ public interface ProductsApi {
             consumes = {"application/json"}
     )
 
-    default ResponseEntity<Product> postProduct(
+    public ResponseEntity<Product> postProduct(
             @NotNull @Parameter(name = "user_id", description = "The user caller's ID", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "user_id", required = true) Integer userId,
             @Parameter(name = "NewProduct", description = "Request body for creating a new Product") @Valid @RequestBody(required = false) NewProduct newProduct
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"owner\" : { \"image\" : \"image\", \"id\" : 0, \"username\" : \"username\" }, \"image\" : \"image\", \"category_id\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
+    );
 
 
     /**
@@ -238,23 +199,11 @@ public interface ProductsApi {
             consumes = {"application/json"}
     )
 
-    default ResponseEntity<Product> putProduct(
-            @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+    public ResponseEntity<Product> putProduct(
+            @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") Integer id,
             @NotNull @Parameter(name = "user_id", description = "The user caller's ID", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "user_id", required = true) Integer userId,
             @Parameter(name = "NewProduct", description = "Request body for creating a new Product") @Valid @RequestBody(required = false) NewProduct newProduct
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"owner\" : { \"image\" : \"image\", \"id\" : 0, \"username\" : \"username\" }, \"image\" : \"image\", \"category_id\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
+    );
 
 
     /**
@@ -284,20 +233,9 @@ public interface ProductsApi {
             produces = {"application/json"}
     )
 
-    default ResponseEntity<List<Product>> searchProducts(
-            @NotNull @Parameter(name = "user_id", description = "The user caller's ID", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "user_id", required = true) Integer userId
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"owner\" : { \"image\" : \"image\", \"id\" : 0, \"username\" : \"username\" }, \"image\" : \"image\", \"category_id\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\" }, { \"owner\" : { \"image\" : \"image\", \"id\" : 0, \"username\" : \"username\" }, \"image\" : \"image\", \"category_id\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\" } ]";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
+    public ResponseEntity<List<Product>> searchProducts(
+            @NotNull @Parameter(name = "user_id", description = "The user caller's ID", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "user_id", required = true) Integer userId,
+            @Parameter(name = "name", description = "") @RequestParam(value = "name", required = false) String name
+    );
 
 }
