@@ -61,7 +61,8 @@ public class UserEntity implements Serializable, DTO<UserInfo> {
     @ColumnDefault("'ROLE_USER'")
     @Lob
     @Column(name = "role", nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private RoleType role;
 
     @OneToMany(mappedBy = "user")
     private Set<ProductEntity> products = new LinkedHashSet<>();

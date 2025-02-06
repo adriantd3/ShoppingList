@@ -36,7 +36,7 @@ public class ProductsService extends DTOService {
     }
 
     public List<Product> searchProduct(Integer userId, String name) {
-        String query = name == null || name.isBlank() ? "" : name;
+        String query = name == null || name.isBlank() ? "" : name.toLowerCase();
         List<ProductEntity> products = productRepository.searchUserProducts(userId, query).orElse(new ArrayList<>());
         return entidadesADTO(products);
     }

@@ -5,3 +5,5 @@ Docs/*.vpp.bak*
 backend/microservices/openapi-generator-cli-7.9.0.jar
 /backend/microservices/products/.idea
 backend/microservices/productsapi.json
+/backend/microservices/products/target
+/backend/microservices/products/target

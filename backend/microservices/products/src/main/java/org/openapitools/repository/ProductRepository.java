@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Integer> {
-    @Query("select m from ProductEntity m where m.user.id = :id and m.name like %:name%")
+    @Query("select m from ProductEntity m where m.user.id = :id and lower(m.name) like %:name%")
     Optional<List<ProductEntity>> searchUserProducts(Integer id, String name);
 }

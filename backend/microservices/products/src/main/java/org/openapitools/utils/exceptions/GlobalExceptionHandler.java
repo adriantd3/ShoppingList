@@ -3,8 +3,10 @@ package org.openapitools.utils.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 
 import java.util.NoSuchElementException;
@@ -25,8 +27,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UserException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(UserException e) {
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentTypeMismatchException e) {
+        String errorMessage = ExceptionMessage.BAD_REQUEST;
+        ErrorResponse errorResponse = new ErrorResponse(errorMessage, 400);
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(MissingRequestHeaderException e) {
         String errorMessage = ExceptionMessage.UNAUTHORIZED;
         ErrorResponse errorResponse = new ErrorResponse(errorMessage, 401);
 
