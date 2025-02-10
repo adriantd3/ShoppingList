@@ -1,0 +1,441 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "UsersAPI",
+    "description": "Microservice that manages user authenticacion and information",
+    "termsOfService": "",
+    "contact": {
+      "email": ""
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "0.1"
+  },
+  "externalDocs": {
+    "description": "Find out more about spec",
+    "url": ""
+  },
+  "servers": [],
+  "tags": [
+    {
+      "name": "internal",
+      "description": "",
+      "externalDocs": {
+        "description": "",
+        "url": ""
+      }
+    }
+  ],
+  "paths": {
+    "/users/auth/userpasswd": {
+      "post": {
+        "summary": "Authenticate providing user and password",
+        "description": "",
+        "operationId": "auth_userpasswd",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {},
+            "headers": {}
+          },
+          "403": {
+            "description": "Username or password not correct",
+            "content": {},
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "username",
+                  "password"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/auth/google": {
+      "post": {
+        "description": "",
+        "operationId": "auth_google",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {},
+            "headers": {}
+          },
+          "403": {
+            "description": "Invalid token",
+            "content": {},
+            "headers": {}
+          }
+        },
+        "summary": "Authenticate providing Google access token",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/TokenAuth"
+        }
+      }
+    },
+    "/users/auth/facebook": {
+      "post": {
+        "description": "",
+        "operationId": "auth_facebook_token",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {},
+            "headers": {}
+          },
+          "403": {
+            "description": "Invalid token",
+            "content": {},
+            "headers": {}
+          }
+        },
+        "summary": "Authenticate providing Facebook access token",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/TokenAuth"
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Get user's public information",
+        "description": "Only returns existing users. If no ID exists, returns empty list",
+        "operationId": "get_users_info",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserPublicInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "summary": "Check wheter users exists",
+        "description": "Returns 204 if all users exists, 404 if any of them does not exist",
+        "operationId": "check_users_id",
+        "tags": [
+          "internal"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": "",
+            "content": {},
+            "headers": {}
+          }
+        }
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "description": "Set of user IDs to request",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required": true
+        }
+      ]
+    },
+    "/users/private/{id}": {
+      "get": {
+        "description": "",
+        "operationId": "get_user_private_info",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPrivateInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User ID is mandatory to access this resource",
+            "content": {},
+            "headers": {}
+          },
+          "403": {
+            "description": "You do not have permission to access this resource",
+            "content": {},
+            "headers": {}
+          },
+          "404": {
+            "description": "User not found",
+            "content": {},
+            "headers": {}
+          }
+        },
+        "summary": "Get a user's private info"
+      },
+      "put": {
+        "description": "",
+        "operationId": "update_user_info",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "headers": {},
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPrivateInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User ID is mandatory to access this resource",
+            "content": {},
+            "headers": {}
+          },
+          "403": {
+            "description": "You do not have permission to modify this resource",
+            "content": {},
+            "headers": {}
+          },
+          "404": {
+            "description": "User not found",
+            "content": {},
+            "headers": {}
+          }
+        },
+        "summary": "Update a user's info"
+      },
+      "parameters": [
+        {
+          "in": "header",
+          "name": "user_id",
+          "description": "The user caller's ID",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ]
+    },
+    "/users/private": {
+      "post": {
+        "summary": "Create a new user",
+        "description": "",
+        "operationId": "create_user",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {},
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewUserInfo"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserPublicInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "image"
+        ]
+      },
+      "UserPrivateInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "premium": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nickname",
+          "name",
+          "lastname",
+          "email",
+          "premium",
+          "role"
+        ]
+      },
+      "TokenResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "iat": {
+            "type": "string"
+          },
+          "exp": {
+            "type": "string"
+          },
+          "user_info": {
+            "$ref": "#/components/schemas/UserPublicInfo"
+          }
+        },
+        "required": [
+          "token",
+          "iat",
+          "exp",
+          "user_info"
+        ]
+      },
+      "NewUserInfo": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "name",
+          "lastname",
+          "email",
+          "password"
+        ]
+      }
+    },
+    "securitySchemes": {},
+    "headers": {},
+    "requestBodies": {
+      "TokenAuth": {
+        "required": false,
+        "description": "",
+        "content": {
+          "text": {
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
