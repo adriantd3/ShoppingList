@@ -6,3 +6,4 @@ backend/microservices/openapi-generator-cli-7.9.0.jar
 /backend/microservices/products/.idea
 /backend/microservices/products/target
 /backend/microservices/products/target
+backend/microservices/users/src/main/resources/firebase-service-account.json
