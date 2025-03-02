@@ -1,4 +1,4 @@
-package org.dutylist.users.api;
+package org.dutylist.users.api.priv;
 
 import org.dutylist.users.models.request.NewUserInfo;
 import org.dutylist.users.models.request.PutUserInfo;

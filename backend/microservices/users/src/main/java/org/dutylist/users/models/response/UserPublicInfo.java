@@ -3,7 +3,6 @@ package org.dutylist.users.models.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta;
 
 @Data
 @AllArgsConstructor

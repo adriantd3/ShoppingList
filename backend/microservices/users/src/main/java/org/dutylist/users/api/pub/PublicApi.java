@@ -1,4 +1,4 @@
-package org.dutylist.users.api;
+package org.dutylist.users.api.pub;
 
 import org.dutylist.users.models.response.UserPublicInfo;
 import org.springframework.http.ResponseEntity;
@@ -7,9 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@Validated
-@RequestMapping("/")
 public interface PublicApi {
 
     @GetMapping()
