@@ -18,4 +18,5 @@ public class ItemResponse {
     UnitType type;
     ProductResponse product;
     Boolean purchased;
+    String description;
 }

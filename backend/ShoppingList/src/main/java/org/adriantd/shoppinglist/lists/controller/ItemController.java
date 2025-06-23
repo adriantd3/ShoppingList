@@ -3,51 +3,56 @@ package org.adriantd.shoppinglist.lists.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.adriantd.shoppinglist.auth.service.CurrentUserService;
-import org.adriantd.shoppinglist.lists.dto.items.ItemRequest;
 import org.adriantd.shoppinglist.lists.dto.items.RegisterItemRequest;
 import org.adriantd.shoppinglist.lists.dto.items.ItemResponse;
+import org.adriantd.shoppinglist.lists.dto.items.UpdateItemRequest;
 import org.adriantd.shoppinglist.lists.service.ItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/lists/items")
+@RequestMapping("/list/{listId}/item")
 public class ItemController {
 
     private final ItemService itemService;
     private final CurrentUserService currentUserService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<List<ItemResponse>> getListItems(@PathVariable int id) {
-        return ResponseEntity.ok(itemService.getAllItemsFromListId(id));
+    @GetMapping("")
+    public ResponseEntity<List<ItemResponse>> getListItems(@PathVariable int listId) {
+        return ResponseEntity.ok(itemService.getAllItemsFromListId(listId));
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<ItemResponse> addItem(@Valid @RequestBody RegisterItemRequest registerItemRequest){
-        return ResponseEntity.ok(itemService.addItemToList(registerItemRequest, currentUserService.getCurrentUserNickname()));
+    @GetMapping("/{itemId}")
+    public ResponseEntity<ItemResponse> getItem(@PathVariable int listId, @PathVariable int itemId) {
+        return ResponseEntity.ok(itemService.getItemFromList(listId, itemId, currentUserService.getCurrentUserNickname()));
     }
 
-    @PostMapping("/remove")
-    public ResponseEntity<Void> removeItem(@Valid @RequestBody ItemRequest itemRequest) {
-        itemService.removeItemsFromRequest(itemRequest, currentUserService.getCurrentUserNickname());
+    @PostMapping("")
+    public ResponseEntity<ItemResponse> addItem(@PathVariable int listId, @Valid @RequestBody RegisterItemRequest registerItemRequest) {
+        return ResponseEntity.ok(itemService.addItemToList(registerItemRequest, listId, currentUserService.getCurrentUserNickname()));
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity<Void> removeItem(@PathVariable int listId, @RequestParam List<Integer> productId) {
+        itemService.removeItemsFromList(listId, productId, currentUserService.getCurrentUserNickname());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping("")
+    public ResponseEntity<Void> updateItem(@PathVariable int listId, @Valid @RequestBody UpdateItemRequest itemRequest) {
+        itemService.updateItem(listId, itemRequest, currentUserService.getCurrentUserNickname());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/state")
-    public ResponseEntity<Void> updateItemPurchasedState(@Valid @RequestBody ItemRequest itemRequest) {
-        itemService.updateItemsPurchased(itemRequest, currentUserService.getCurrentUserNickname());
+    public ResponseEntity<Void> updateItemPurchasedState(@PathVariable int listId, @RequestParam List<Integer> productId, @RequestParam boolean purchased) {
+        itemService.updateItemsState(listId, productId, purchased, currentUserService.getCurrentUserNickname());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<Void> updateItem(@Valid @RequestBody RegisterItemRequest registerItemRequest) {
-        itemService.updateItem(registerItemRequest, currentUserService.getCurrentUserNickname());
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
 
 }

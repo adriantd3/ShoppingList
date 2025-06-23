@@ -51,6 +51,10 @@ public class Item implements Serializable, DTO<ItemResponse> {
     @Column(name = "purchased", nullable = false)
     private Boolean purchased = false;
 
+    @Lob
+    @Column(name = "description")
+    private String description;
+
     @Override
     public ItemResponse toDTO() {
         return ItemResponse.builder()
@@ -60,6 +64,7 @@ public class Item implements Serializable, DTO<ItemResponse> {
                 .type(type)
                 .product(product.toDTO())
                 .purchased(purchased)
+                .description(description)
                 .build();
     }
 }

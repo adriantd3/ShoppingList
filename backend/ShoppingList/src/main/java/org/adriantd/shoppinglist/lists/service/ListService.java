@@ -6,6 +6,7 @@ import org.adriantd.shoppinglist.auth.entity.User;
 import org.adriantd.shoppinglist.lists.dao.ShopListRepository;
 import org.adriantd.shoppinglist.lists.dto.lists.ListInfoResponse;
 import org.adriantd.shoppinglist.lists.dto.lists.ListRequest;
+import org.adriantd.shoppinglist.lists.dto.lists.ListUpdateRequest;
 import org.adriantd.shoppinglist.lists.entity.lists.Shoplist;
 import org.adriantd.shoppinglist.utils.DTOService;
 import org.adriantd.shoppinglist.utils.ExceptionMessage;
@@ -59,13 +60,15 @@ public class ListService extends DTOService {
         shopListRepository.delete(shoplist);
     }
 
-    public void updateShoplist(Integer id, String name, Integer userId){
+    public void updateShoplist(Integer id, ListUpdateRequest request, Integer userId){
         Shoplist shoplist = shopListRepository.findById(id).orElseThrow();
         User user = userRepository.findById(userId).orElseThrow();
 
         validateUserAuthorization(shoplist, user);
 
-        shoplist.setName(name);
+        shoplist.setName(request.getName());
+        // Type should not be updated
+        // Add style param
 
         shopListRepository.save(shoplist);
     }

@@ -10,7 +10,7 @@ import org.adriantd.shoppinglist.lists.entity.items.UnitType;
 @Data
 @Builder
 @AllArgsConstructor
-public class RegisterItemRequest {
+public class UpdateItemRequest {
     @NotNull
     Integer productId;
     @NotNull

@@ -1,14 +1,13 @@
 package org.adriantd.shoppinglist.lists.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.adriantd.shoppinglist.auth.dao.UserRepository;
 import org.adriantd.shoppinglist.auth.entity.User;
 import org.adriantd.shoppinglist.lists.dao.ItemRepository;
 import org.adriantd.shoppinglist.lists.dao.ShopListRepository;
-import org.adriantd.shoppinglist.lists.dto.items.ItemRequest;
 import org.adriantd.shoppinglist.lists.dto.items.RegisterItemRequest;
 import org.adriantd.shoppinglist.lists.dto.items.ItemResponse;
+import org.adriantd.shoppinglist.lists.dto.items.UpdateItemRequest;
 import org.adriantd.shoppinglist.lists.entity.items.Item;
 import org.adriantd.shoppinglist.lists.entity.items.ItemId;
 import org.adriantd.shoppinglist.lists.entity.lists.Shoplist;
@@ -32,15 +31,33 @@ public class ItemService extends DTOService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
-    public List<ItemResponse> getAllItemsFromListId(Integer shoplistId) {
-        List<Item> items = itemRepository.findAllByShoppingListId(shoplistId);
+    public List<ItemResponse> getAllItemsFromListId(Integer listId) {
+        Shoplist shoplist = shopListRepository.findById(listId).orElseThrow();
+        User user = userRepository.findByNickname(shoplist.getUserOwner().getNickname()).orElseThrow();
+        validateUserAuthorization(shoplist, user);
+
+        List<Item> items = itemRepository.findAllByShoppingListId(listId);
 
         return entidadesADTO(items);
     }
 
+    public ItemResponse getItemFromList(Integer listId, Integer itemId, String nickname) {
+        Shoplist shoplist = shopListRepository.findById(listId).orElseThrow();
+        User user = userRepository.findByNickname(nickname).orElseThrow();
+
+        validateUserAuthorization(shoplist, user);
+
+        ItemId itemIdObj = new ItemId(listId, itemId);
+        validateItemExistence(itemIdObj);
+
+        Item item = itemRepository.findById(itemIdObj).orElseThrow();
+
+        return item.toDTO();
+    }
+
     @Transactional
-    public ItemResponse addItemToList(RegisterItemRequest registerItemRequest, String nickname){
-        Shoplist shoplist = shopListRepository.findById(registerItemRequest.getShoplistId()).orElseThrow();
+    public ItemResponse addItemToList(RegisterItemRequest registerItemRequest, Integer listId ,String nickname){
+        Shoplist shoplist = shopListRepository.findById(listId).orElseThrow();
         User user = userRepository.findByNickname(nickname).orElseThrow();
 
         validateUserAuthorization(shoplist, user);
@@ -57,6 +74,7 @@ public class ItemService extends DTOService {
         item.setUser(user);
         item.setUnits(registerItemRequest.getUnits());
         item.setType(registerItemRequest.getType());
+        item.setDescription(registerItemRequest.getDescription());
         item.setPurchased(false);
 
         itemRepository.save(item);
@@ -65,16 +83,16 @@ public class ItemService extends DTOService {
     }
 
     @Transactional
-    public void removeItemsFromRequest(ItemRequest itemRequest, String nickname) {
+    public void removeItemsFromList(Integer listId, List<Integer> productIds, String nickname) {
         User user = userRepository.findByNickname(nickname).orElseThrow();
-        Shoplist shoplist = shopListRepository.findById(itemRequest.getShoplistId()).orElseThrow();
+        Shoplist shoplist = shopListRepository.findById(listId).orElseThrow();
+
         validateUserAuthorization(shoplist, user);
 
-        Integer[] productIds = itemRequest.getProductIds();
-        for (Integer productId : productIds) {
-            removeSingleItem(itemRequest.getShoplistId(), productId);
-        }
-
+        List<ItemId> itemIds = productIds.stream()
+                .map(productId -> new ItemId(listId, productId))
+                .toList();
+        itemRepository.deleteAllById(itemIds);
     }
 
     private void removeSingleItem(Integer shoplistId, Integer productId){
@@ -85,17 +103,13 @@ public class ItemService extends DTOService {
     }
 
     @Transactional
-    public void updateItemsPurchased(ItemRequest itemRequest, String nickname){
+    public void updateItemsState(Integer listId, List<Integer> productIds, boolean state, String nickname){
         User user = userRepository.findByNickname(nickname).orElseThrow();
-        Shoplist shoplist = shopListRepository.findById(itemRequest.getShoplistId()).orElseThrow();
-        if(!isUserAllowed(shoplist, user)) {
-            throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_LIST);
-        }
+        Shoplist shoplist = shopListRepository.findById(listId).orElseThrow();
 
-        Integer[] productIds = itemRequest.getProductIds();
-        for (Integer productId : productIds) {
-            updateSingleItemState(shoplist,productId);
-        }
+        validateUserAuthorization(shoplist, user);
+
+        itemRepository.updateItemStateByListAndProductIds(listId, productIds, state);
     }
 
     private void updateSingleItemState(Shoplist shoplist, Integer productId)  {
@@ -109,20 +123,21 @@ public class ItemService extends DTOService {
     }
 
     @Transactional
-    public void updateItem(@Valid RegisterItemRequest registerItemRequest, String nickname) {
-        Shoplist shoplist = shopListRepository.findById(registerItemRequest.getShoplistId()).orElseThrow();
+    public void updateItem(Integer listId, UpdateItemRequest request, String nickname) {
+        Shoplist shoplist = shopListRepository.findById(listId).orElseThrow();
         User user = userRepository.findByNickname(nickname).orElseThrow();
 
         validateUserAuthorization(shoplist, user);
 
-        Product product = productRepository.findById(registerItemRequest.getProductId()).orElseThrow();
+        Product product = productRepository.findById(request.getProductId()).orElseThrow();
         ItemId itemId = new ItemId(shoplist.getId(),product.getId());
 
         validateItemExistence(itemId);
 
         Item item = itemRepository.findById(itemId).orElseThrow();
-        item.setUnits(registerItemRequest.getUnits());
-        item.setType(registerItemRequest.getType());
+        item.setUnits(request.getUnits());
+        item.setType(request.getType());
+        item.setDescription(request.getDescription());
 
         itemRepository.save(item);
 
