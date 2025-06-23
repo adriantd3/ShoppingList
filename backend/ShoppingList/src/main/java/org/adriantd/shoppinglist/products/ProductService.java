@@ -7,7 +7,6 @@ import org.adriantd.shoppinglist.auth.dao.UserRepository;
 import org.adriantd.shoppinglist.auth.entity.User;
 import org.adriantd.shoppinglist.products.dto.ProductRequest;
 import org.adriantd.shoppinglist.products.dto.ProductResponse;
-import org.adriantd.shoppinglist.products.entity.Category;
 import org.adriantd.shoppinglist.products.entity.Product;
 import org.adriantd.shoppinglist.utils.DTOService;
 import org.adriantd.shoppinglist.utils.ExceptionMessage;
@@ -42,9 +41,8 @@ public class ProductService extends DTOService {
     @Transactional
     public ProductResponse registerProduct(ProductRequest productRequest, Integer userId) {
         User user = userRepository.findById(userId).orElseThrow();
-        Category category = categoryRepository.findById(productRequest.getCategoryId()).orElseThrow();
 
-        Product newProduct = createEntity(productRequest, user);
+        Product newProduct = createFromExisting(productRequest, user);
         productRepository.save(newProduct);
 
         return newProduct.toDTO();
@@ -73,17 +71,16 @@ public class ProductService extends DTOService {
 
     private void updateEntity(Product product, ProductRequest productRequest) {
         product.setName(productRequest.getName());
-        product.setImage(productRequest.getImage());
         product.setCategory(categoryRepository.findById(productRequest.getCategoryId()).orElseThrow());
-        product.setDescription(productRequest.getDescription());
     }
 
-    private Product createEntity(ProductRequest productRequest, User user) {
+    private Product createFromExisting(ProductRequest productRequest, User user) {
         Product product = new Product();
 
         this.updateEntity(product, productRequest);
         product.setUser(user);
         product.setTimestamp(Instant.now());
+        product.setUserGenerated(true);
 
         return product;
     }
@@ -93,7 +90,7 @@ public class ProductService extends DTOService {
     }
 
     private void validateUserAuthorization(Product product, User user) {
-        if (!isUserOwner(product, user)) {
+        if (!product.getUserGenerated() || !isUserOwner(product, user)) {
             throw new AccessDeniedException(ExceptionMessage.USER_NOT_AUTHORIZED_PRODUCT);
         }
     }

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/product")
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -34,18 +34,18 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllUserProducts(currentUserService.getCurrentUserId()));
     }
 
-    @PostMapping("/register")
+    @PostMapping("")
     public ResponseEntity<ProductResponse> registerProduct(@RequestBody ProductRequest productRequest){
         return ResponseEntity.ok(productService.registerProduct(productRequest, currentUserService.getCurrentUserId()));
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Void> updateProduct(@PathVariable Integer id, @Valid @RequestBody ProductRequest productRequest){
         productService.updateProduct(id, productRequest, currentUserService.getCurrentUserNickname());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public HttpStatus deleteProduct(@PathVariable Integer id){
         productService.deleteProduct(id, currentUserService.getCurrentUserNickname());
         return HttpStatus.NO_CONTENT;
