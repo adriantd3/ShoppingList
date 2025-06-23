@@ -14,9 +14,5 @@ public class ProductRequest {
     @NotNull
     String name;
     @NotNull
-    String image;
-    @NotNull
     Integer categoryId;
-    @NotNull
-    String description;
 }

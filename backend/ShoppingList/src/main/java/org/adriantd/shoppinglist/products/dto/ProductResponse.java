@@ -14,7 +14,6 @@ public class ProductResponse {
     String owner;
     String name;
     Integer categoryId;
-    String image;
     String timestamp;
-    String description;
+    Boolean userGenerated;
 }

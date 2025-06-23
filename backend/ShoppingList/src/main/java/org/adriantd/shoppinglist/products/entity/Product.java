@@ -41,17 +41,14 @@ public class Product implements Serializable, DTO<ProductResponse> {
     @JoinColumn(name = "category", nullable = false)
     private Category category;
 
-    @Lob
-    @Column(name = "image")
-    private String image;
-
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "timestamp")
     private Instant timestamp;
 
-    @Lob
-    @Column(name = "description")
-    private String description;
+    @NotNull
+    @ColumnDefault("true")
+    @Column(name="user_generated", nullable = false)
+    private Boolean userGenerated;
 
     @Override
     public ProductResponse toDTO() {
@@ -61,9 +58,8 @@ public class Product implements Serializable, DTO<ProductResponse> {
         productResponse.setOwner(this.user.getUsername());
         productResponse.setName(this.name);
         productResponse.setCategoryId(this.category.getId());
-        productResponse.setImage(this.image);
         productResponse.setTimestamp(this.timestamp.toString());
-        productResponse.setDescription(this.description);
+        productResponse.setUserGenerated(this.userGenerated);
 
         return productResponse;
     }
