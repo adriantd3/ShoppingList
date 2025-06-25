@@ -30,6 +30,7 @@ public class FilterChainConfig {
                         authorizeRequests
                                 //Allows auth endpoints to be accessed without authentication
                                 //jwtFilter and UsernamePasswordAuthenticationFilter will not be applied to these endpoints
+                                .requestMatchers("/ws/**", "/ws").permitAll() //WebSocket endpoints
                                 .requestMatchers("/auth/**").permitAll()
                                 .anyRequest().authenticated()
                 ).sessionManagement(sessionManagement ->

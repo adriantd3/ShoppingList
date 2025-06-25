@@ -11,4 +11,5 @@ public class ExceptionMessage {
     public static final String JWT_TOKEN_REQUIRED = "Authentication token is required for this request";
     public static final String INVALID_JWT_TOKEN = "Invalid authentication token";
     public static final String JWT_TOKEN_EXPIRED = "Authentication token is expired, please login to get a new token";
+    public static final String WS_DESTINATION_NOT_FOUND = "WebSocket destination not found or invalid";
 }
