@@ -29,13 +29,19 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        AntPathRequestMatcher matcher = new AntPathRequestMatcher("/auth/**");
+        AntPathRequestMatcher authPathMatcher = new AntPathRequestMatcher("/auth/**");
+
+        AntPathRequestMatcher wsPathMatcher = new AntPathRequestMatcher("/ws/**");
+        if (wsPathMatcher.matches(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String token = getTokenFromRequest(request);
         String username;
 
         if (token == null) {
-            if(matcher.matches(request)) {
+            if(authPathMatcher.matches(request)) {
                 filterChain.doFilter(request, response);
                 return;
             }
