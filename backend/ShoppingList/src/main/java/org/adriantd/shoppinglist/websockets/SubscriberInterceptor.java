@@ -33,7 +33,6 @@ public class SubscriberInterceptor implements ChannelInterceptor {
         if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())){
             UsernamePasswordAuthenticationToken userAuth = (UsernamePasswordAuthenticationToken) accessor.getUser();
             User user = (User) userAuth.getPrincipal();
-
             if (user == null) {
                 throw new IllegalArgumentException(ExceptionMessage.USER_NOT_FOUND);
             }

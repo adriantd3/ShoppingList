@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -26,33 +27,32 @@ public class JWTFilter extends OncePerRequestFilter {
     private final JWTService jwtService;
     private final UserDetailsService userDetailsService;
 
+    private static final List<AntPathRequestMatcher> EXCLUDED_PATHS = List.of(
+            new AntPathRequestMatcher("/auth/**"),
+            new AntPathRequestMatcher("/ws/**")
+    );
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return EXCLUDED_PATHS.stream()
+                .anyMatch(matcher -> matcher.matches(request));
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        AntPathRequestMatcher authPathMatcher = new AntPathRequestMatcher("/auth/**");
-
-        AntPathRequestMatcher wsPathMatcher = new AntPathRequestMatcher("/ws/**");
-        if (wsPathMatcher.matches(request)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         String token = getTokenFromRequest(request);
-        String username;
-
         if (token == null) {
-            if(authPathMatcher.matches(request)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            this.sendError(response, ExceptionMessage.JWT_TOKEN_REQUIRED);
+            sendError(response, ExceptionMessage.JWT_TOKEN_REQUIRED);
             return;
         }
+
+        String username;
         try {
             username = jwtService.getUsernameFromToken(token);
         } catch (RuntimeException e) {
-            this.sendError(response, ExceptionMessage.INVALID_JWT_TOKEN);
+            sendError(response, ExceptionMessage.INVALID_JWT_TOKEN);
             return;
         }
 
@@ -60,12 +60,12 @@ public class JWTFilter extends OncePerRequestFilter {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if(jwtService.isTokenInvalid(token, userDetails)) {
-                this.sendError(response, ExceptionMessage.INVALID_JWT_TOKEN);
+                sendError(response, ExceptionMessage.INVALID_JWT_TOKEN);
                 return;
             }
 
             if(jwtService.isTokenExpired(token)) {
-                this.sendError(response, ExceptionMessage.JWT_TOKEN_EXPIRED);
+                sendError(response, ExceptionMessage.JWT_TOKEN_EXPIRED);
                 return;
             }
 
