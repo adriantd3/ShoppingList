@@ -2,10 +2,10 @@ from datetime import UTC, datetime
 from hashlib import sha256
 from secrets import token_urlsafe
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.core.errors import ApiError, ErrorCode
-from app.modules.auth.schemas import UserPrincipal
+from app.core.request_context import get_request_context
+from app.modules.realtime.events import EVENT_LIST_MEMBER_JOINED
+from app.modules.realtime.service import emit_list_event
 from app.modules.sharing import repository
 from app.modules.sharing.schemas import (
     ShareLinkConsumeRequest,
@@ -26,12 +26,13 @@ def generate_share_token() -> str:
 
 
 async def issue_share_link_for_user(
-    db: AsyncSession,
     *,
     list_id: str,
-    principal: UserPrincipal,
     payload: ShareLinkIssueRequest,
 ) -> ShareLinkIssueResponse:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
     if shopping_list is None:
         raise ApiError(
@@ -57,12 +58,13 @@ async def issue_share_link_for_user(
 
 
 async def revoke_share_link_for_user(
-    db: AsyncSession,
     *,
     list_id: str,
     share_link_id: str,
-    principal: UserPrincipal,
 ) -> ShareLinkResponse:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
     if shopping_list is None:
         raise ApiError(
@@ -86,12 +88,13 @@ async def revoke_share_link_for_user(
 
 
 async def expire_share_link_for_user(
-    db: AsyncSession,
     *,
     list_id: str,
     share_link_id: str,
-    principal: UserPrincipal,
 ) -> ShareLinkResponse:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
     if shopping_list is None:
         raise ApiError(
@@ -115,11 +118,12 @@ async def expire_share_link_for_user(
 
 
 async def consume_share_link_for_user(
-    db: AsyncSession,
     *,
-    principal: UserPrincipal,
     payload: ShareLinkConsumeRequest,
 ) -> ShareLinkConsumeResponse:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     share_link = await repository.get_share_link_by_hash(db, token_hash=hash_share_token(payload.token))
     if share_link is None:
         raise ApiError(
@@ -142,5 +146,14 @@ async def consume_share_link_for_user(
             status_code=409,
         )
 
+    existing_role = await repository.get_membership_role(db, list_id=share_link.list_id, user_id=principal.user_id)
     role = await repository.upsert_member_role(db, list_id=share_link.list_id, user_id=principal.user_id)
+    if existing_role is None:
+        await emit_list_event(
+            db,
+            list_id=share_link.list_id,
+            actor_user_id=principal.user_id,
+            event_type=EVENT_LIST_MEMBER_JOINED,
+            payload={"user_id": principal.user_id, "role": role},
+        )
     return ShareLinkConsumeResponse(list_id=share_link.list_id, membership_role=role)

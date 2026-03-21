@@ -7,6 +7,8 @@ from unittest.mock import AsyncMock
 import pytest
 
 from app.core.errors import ApiError
+from app.core.request_context import clear_request_context, set_request_context
+from app.modules.auth.context import AuthenticatedContext
 from app.modules.auth.schemas import UserPrincipal
 from app.modules.lists import service
 
@@ -31,8 +33,14 @@ async def test_reset_list_for_user_creates_snapshot_and_resets(monkeypatch: pyte
         AsyncMock(return_value=SimpleNamespace(id="snapshot-1")),
     )
     monkeypatch.setattr(service.repository, "reset_items_purchase_flags", AsyncMock(return_value=4))
+    monkeypatch.setattr(service, "emit_list_event", AsyncMock())
 
-    result = await service.reset_list_for_user(cast(Any, db), principal, "list-1")
+    context = AuthenticatedContext(db=cast(Any, db), principal=principal)
+    token = set_request_context(context)
+    try:
+        result = await service.reset_list_for_user("list-1")
+    finally:
+        clear_request_context(token)
 
     assert result.list_id == "list-1"
     assert result.snapshot_id == "snapshot-1"
@@ -52,9 +60,13 @@ async def test_restore_latest_for_user_without_snapshot_returns_not_found(monkey
 
     monkeypatch.setattr(service.repository, "get_list_for_member", AsyncMock(return_value=SimpleNamespace(id="list-1")))
     monkeypatch.setattr(service.repository, "get_latest_pre_reset_snapshot", AsyncMock(return_value=None))
+    monkeypatch.setattr(service, "emit_list_event", AsyncMock())
 
+    context = AuthenticatedContext(db=cast(Any, db), principal=principal)
+    token = set_request_context(context)
     with pytest.raises(ApiError) as exc:
-        await service.restore_latest_for_user(cast(Any, db), principal, "list-1")
+        await service.restore_latest_for_user("list-1")
+    clear_request_context(token)
 
     assert exc.value.status_code == 404
 
@@ -90,8 +102,14 @@ async def test_restore_latest_for_user_replaces_items(monkeypatch: pytest.Monkey
     monkeypatch.setattr(service.repository, "get_list_for_member", AsyncMock(return_value=SimpleNamespace(id="list-1")))
     monkeypatch.setattr(service.repository, "get_latest_pre_reset_snapshot", AsyncMock(return_value=snapshot))
     monkeypatch.setattr(service.repository, "replace_list_items_from_snapshot", AsyncMock(return_value=1))
+    monkeypatch.setattr(service, "emit_list_event", AsyncMock())
 
-    result = await service.restore_latest_for_user(cast(Any, db), principal, "list-1")
+    context = AuthenticatedContext(db=cast(Any, db), principal=principal)
+    token = set_request_context(context)
+    try:
+        result = await service.restore_latest_for_user("list-1")
+    finally:
+        clear_request_context(token)
 
     assert result.list_id == "list-1"
     assert result.snapshot_id == "snapshot-1"

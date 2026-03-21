@@ -54,7 +54,7 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - No frontend migration execution yet from existing UI components to Tamagui.
 - UI screen-map, technical design, and implementation task breakdown are defined for feature 006.
 - No explicit performance/load validation runs yet for NFR targets.
-- Feature 007 tasks 11-20 remain pending (realtime, hardening, full contract/integration/realtime suites).
+- Feature 007 tasks 15-20 remain pending (contract/realtime integration suites, security evidence rollup, docs, and final traceability sweep).
 
 ## Traceability Update (Feature 007 Milestone A-B)
 - FR-backend-11, NFR-01, NFR-03
@@ -82,10 +82,39 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- Code: `backend/python-api/app/api/rest/v1/endpoints/lists.py`, `backend/python-api/app/modules/lists/schemas.py`, `backend/python-api/app/modules/lists/service.py`, `backend/python-api/app/modules/lists/repository.py`
 	- Tests: `backend/python-api/tests/integration/lists/test_reset_restore_contract.py`, `backend/python-api/tests/unit/lists/test_reset_restore_service.py`
 
+## Traceability Update (Feature 007 Milestone C)
+- FR-backend-04, FR-backend-05 (Task 11)
+	- Code: `backend/python-api/app/api/ws/router.py`, `backend/python-api/app/modules/realtime/schemas.py`, `backend/python-api/app/modules/realtime/repository.py`, `backend/python-api/app/modules/realtime/service.py`, `backend/python-api/app/modules/realtime/manager.py`, `backend/python-api/app/main.py`
+	- Tests: `backend/python-api/tests/integration/core/test_ws_contract.py`, `backend/python-api/tests/unit/realtime/test_realtime_service.py`
+- FR-backend-04, FR-backend-07 (Task 12)
+	- Code: `backend/python-api/app/modules/realtime/events.py`, `backend/python-api/app/modules/lists/service.py`, `backend/python-api/app/modules/sharing/service.py`
+	- Tests: `backend/python-api/tests/unit/lists/test_realtime_emission.py`, `backend/python-api/tests/unit/lists/test_reset_restore_service.py`, `backend/python-api/tests/unit/sharing/test_service.py`
+- FR-backend-03 (Task 13)
+	- Code: `backend/python-api/app/api/rest/v1/endpoints/profile.py`, `backend/python-api/app/api/rest/v1/router.py`, `backend/python-api/app/modules/notifications/schemas.py`, `backend/python-api/app/modules/notifications/repository.py`, `backend/python-api/app/modules/notifications/service.py`
+	- Tests: `backend/python-api/tests/integration/core/test_profile_contract.py`
+- FR-backend-05, FR-backend-10, NFR-02 (Task 14)
+	- Code: `backend/python-api/app/core/rate_limit.py`, `backend/python-api/app/core/config.py`, `backend/python-api/app/core/errors.py`, `backend/python-api/app/main.py`, `backend/python-api/app/api/rest/v1/endpoints/auth.py`, `backend/python-api/app/api/rest/v1/endpoints/sharing.py`
+	- Tests: `backend/python-api/tests/integration/core/test_security_hardening.py`, `backend/python-api/tests/integration/core/test_error_contract.py`
+
+## Traceability Update (Feature 007 Backend Architecture Refinement)
+- NFR-03 maintainability (request-scoped context hard cutover)
+	- Code: `backend/python-api/app/core/request_context.py`, `backend/python-api/app/modules/auth/context.py`, `backend/python-api/app/api/rest/v1/endpoints/lists.py`, `backend/python-api/app/api/rest/v1/endpoints/sharing.py`, `backend/python-api/app/api/rest/v1/endpoints/profile.py`, `backend/python-api/app/modules/lists/service.py`, `backend/python-api/app/modules/sharing/service.py`, `backend/python-api/app/modules/notifications/service.py`
+	- Tests: `backend/python-api/tests/unit/lists/test_realtime_emission.py`, `backend/python-api/tests/unit/lists/test_reset_restore_service.py`, `backend/python-api/tests/unit/sharing/test_service.py`, `backend/python-api/tests/integration/core/test_profile_contract.py`, `backend/python-api/tests/integration/lists/test_contract.py`, `backend/python-api/tests/integration/sharing/test_sharing_contract.py`
+
 ## Validation Evidence (Task 8-10)
 - `uv run ruff check .` -> pass
 - `uv run mypy app tests` -> pass
 - `uv run pytest` -> pass (33 passed, 3 warnings)
+
+## Validation Evidence (Milestone C: Task 11-14)
+- `uv run ruff check .` -> pass
+- `uv run mypy app tests` -> pass
+- `uv run pytest -q` -> pass (52 passed, 3 warnings)
+
+## Validation Evidence (Architecture Refinement)
+- `.venv/Scripts/python.exe -m ruff check .` -> pass
+- `.venv/Scripts/python.exe -m mypy app tests` -> pass
+- `.venv/Scripts/python.exe -m pytest -q` -> pass (52 passed, 3 warnings)
 
 ## Security Notes (Task 8)
 - Risks considered: duplicate replayed mutations, ambiguous idempotency key reuse with altered payloads, and replay-store growth.
@@ -109,11 +138,11 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- `003-shared-realtime-list`: full-stack
 	- `004-template-and-reset`: full-stack
 	- `005-platform-and-stack`: backend + frontend + devops
-2. Continue Milestone C for feature 007 (tasks 11-14): realtime infrastructure and security hardening.
+2. Start Milestone D for feature 007 (tasks 15-20): contract/realtime integration suites, security evidence rollup, and backend contract publication.
 3. Define Tamagui design tokens and base component layer for React Native screens.
 4. Begin phase-4 execution for `006-ui-screen-map` following `006-ui-screen-map-tasks.md`.
 5. Implement auth and list domains first (`001`, `002`) to unlock MVP usage.
 6. Implement collaboration and reset workflows (`003`, `004`) with integration tests.
 7. Extend backend test suites with integration and contract coverage for new routes.
-8. Add security hardening controls (rate limiting, strict body/content limits, CORS policy finalization) in Milestone C.
+8. Expand Milestone D security evidence with endpoint-level checklist and evaluate distributed rate limiting for multi-instance deployments.
 9. Keep this file updated with requirement-to-code-to-test traceability as implementation progresses.

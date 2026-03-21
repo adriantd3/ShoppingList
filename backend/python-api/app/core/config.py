@@ -25,6 +25,10 @@ class Settings(BaseSettings):
 
     log_level: str = "INFO"
     idempotency_replay_ttl_minutes: int = 1440
+    auth_rate_limit_per_minute: int = 10
+    share_link_rate_limit_per_minute: int = 30
+    max_request_body_bytes: int = 1048576
+    enforce_json_content_type: bool = True
 
     model_config = SettingsConfigDict(
         env_file=None,
@@ -54,6 +58,15 @@ class Settings(BaseSettings):
 
         if self.idempotency_replay_ttl_minutes <= 0:
             raise ValueError("idempotency_replay_ttl_minutes must be greater than 0")
+
+        if self.auth_rate_limit_per_minute <= 0:
+            raise ValueError("auth_rate_limit_per_minute must be greater than 0")
+
+        if self.share_link_rate_limit_per_minute <= 0:
+            raise ValueError("share_link_rate_limit_per_minute must be greater than 0")
+
+        if self.max_request_body_bytes <= 0:
+            raise ValueError("max_request_body_bytes must be greater than 0")
 
         return self
 

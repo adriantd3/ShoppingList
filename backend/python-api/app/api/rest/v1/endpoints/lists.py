@@ -1,13 +1,12 @@
 import json
 from typing import Any, cast
 
-from fastapi import APIRouter, Depends, Request, Response, status
+from fastapi import APIRouter, Request, Response, status
 from fastapi.encoders import jsonable_encoder
 
-from app.api.dependencies import DbSession
 from app.core.idempotency import IdempotencyPrecheck, persist_mutation_idempotency, prepare_mutation_idempotency
-from app.modules.auth.dependencies import get_current_user
-from app.modules.auth.schemas import UserPrincipal
+from app.core.request_context import get_request_context
+from app.modules.auth.context import AuthenticatedContextDep
 from app.modules.lists.schemas import (
     ListCreateRequest,
     ListItemCreateRequest,
@@ -37,9 +36,10 @@ router = APIRouter(prefix="/lists", tags=["lists"])
 
 async def _prepare_idempotency(
     request: Request,
-    db: DbSession,
-    principal: UserPrincipal,
 ) -> IdempotencyPrecheck:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     payload_bytes = await request.body()
     return await prepare_mutation_idempotency(
         db,
@@ -52,12 +52,13 @@ async def _prepare_idempotency(
 
 
 async def _persist_idempotency(
-    db: DbSession,
     precheck: IdempotencyPrecheck,
     *,
     status_code: int,
     response_body: dict[str, Any] | list[Any] | None,
 ) -> Response | None:
+    context = get_request_context()
+    db = context.db
     replay = await persist_mutation_idempotency(
         db,
         context=precheck.context,
@@ -86,24 +87,22 @@ def _as_response_body(payload: Any) -> dict[str, Any] | list[Any] | None:
 
 
 @router.get("", response_model=list[ListResponse])
-async def get_lists(db: DbSession, principal: UserPrincipal = Depends(get_current_user)) -> list[ListResponse]:
-    return await list_lists_for_user(db, principal)
+async def get_lists(_: AuthenticatedContextDep) -> list[ListResponse]:
+    return await list_lists_for_user()
 
 
 @router.post("", response_model=ListResponse, status_code=status.HTTP_201_CREATED)
 async def create_list(
     request: Request,
     payload: ListCreateRequest,
-    db: DbSession,
-    principal: UserPrincipal = Depends(get_current_user),
+    _: AuthenticatedContextDep,
 ) -> ListResponse | Response:
-    precheck = await _prepare_idempotency(request, db, principal)
+    precheck = await _prepare_idempotency(request)
     if precheck.replay is not None:
         return precheck.replay.to_http_response()
 
-    created = await create_list_for_user(db, principal, payload)
+    created = await create_list_for_user(payload)
     replay = await _persist_idempotency(
-        db,
         precheck,
         status_code=status.HTTP_201_CREATED,
         response_body=_as_response_body(created),
@@ -114,8 +113,8 @@ async def create_list(
 
 
 @router.get("/{list_id}", response_model=ListResponse)
-async def get_list(list_id: str, db: DbSession, principal: UserPrincipal = Depends(get_current_user)) -> ListResponse:
-    return await get_list_for_user(db, principal, list_id)
+async def get_list(list_id: str, _: AuthenticatedContextDep) -> ListResponse:
+    return await get_list_for_user(list_id)
 
 
 @router.patch("/{list_id}", response_model=ListResponse)
@@ -123,16 +122,14 @@ async def patch_list(
     request: Request,
     list_id: str,
     payload: ListUpdateRequest,
-    db: DbSession,
-    principal: UserPrincipal = Depends(get_current_user),
+    _: AuthenticatedContextDep,
 ) -> ListResponse | Response:
-    precheck = await _prepare_idempotency(request, db, principal)
+    precheck = await _prepare_idempotency(request)
     if precheck.replay is not None:
         return precheck.replay.to_http_response()
 
-    updated = await update_list_for_user(db, principal, list_id, payload)
+    updated = await update_list_for_user(list_id, payload)
     replay = await _persist_idempotency(
-        db,
         precheck,
         status_code=status.HTTP_200_OK,
         response_body=_as_response_body(updated),
@@ -143,14 +140,13 @@ async def patch_list(
 
 
 @router.delete("/{list_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_list(request: Request, list_id: str, db: DbSession, principal: UserPrincipal = Depends(get_current_user)) -> Response:
-    precheck = await _prepare_idempotency(request, db, principal)
+async def remove_list(request: Request, list_id: str, _: AuthenticatedContextDep) -> Response:
+    precheck = await _prepare_idempotency(request)
     if precheck.replay is not None:
         return precheck.replay.to_http_response()
 
-    await delete_list_for_user(db, principal, list_id)
+    await delete_list_for_user(list_id)
     replay = await _persist_idempotency(
-        db,
         precheck,
         status_code=status.HTTP_204_NO_CONTENT,
         response_body=None,
@@ -163,10 +159,9 @@ async def remove_list(request: Request, list_id: str, db: DbSession, principal: 
 @router.get("/{list_id}/items", response_model=list[ListItemResponse])
 async def get_list_items(
     list_id: str,
-    db: DbSession,
-    principal: UserPrincipal = Depends(get_current_user),
+    _: AuthenticatedContextDep,
 ) -> list[ListItemResponse]:
-    return await list_items_for_user(db, principal, list_id)
+    return await list_items_for_user(list_id)
 
 
 @router.post("/{list_id}/items", response_model=ListItemResponse, status_code=status.HTTP_201_CREATED)
@@ -174,16 +169,14 @@ async def create_list_item(
     request: Request,
     list_id: str,
     payload: ListItemCreateRequest,
-    db: DbSession,
-    principal: UserPrincipal = Depends(get_current_user),
+    _: AuthenticatedContextDep,
 ) -> ListItemResponse | Response:
-    precheck = await _prepare_idempotency(request, db, principal)
+    precheck = await _prepare_idempotency(request)
     if precheck.replay is not None:
         return precheck.replay.to_http_response()
 
-    created = await create_item_for_user(db, principal, list_id, payload)
+    created = await create_item_for_user(list_id, payload)
     replay = await _persist_idempotency(
-        db,
         precheck,
         status_code=status.HTTP_201_CREATED,
         response_body=_as_response_body(created),
@@ -199,16 +192,14 @@ async def patch_list_item(
     list_id: str,
     item_id: str,
     payload: ListItemUpdateRequest,
-    db: DbSession,
-    principal: UserPrincipal = Depends(get_current_user),
+    _: AuthenticatedContextDep,
 ) -> ListItemResponse | Response:
-    precheck = await _prepare_idempotency(request, db, principal)
+    precheck = await _prepare_idempotency(request)
     if precheck.replay is not None:
         return precheck.replay.to_http_response()
 
-    updated = await update_item_for_user(db, principal, list_id, item_id, payload)
+    updated = await update_item_for_user(list_id, item_id, payload)
     replay = await _persist_idempotency(
-        db,
         precheck,
         status_code=status.HTTP_200_OK,
         response_body=_as_response_body(updated),
@@ -223,16 +214,14 @@ async def remove_list_item(
     request: Request,
     list_id: str,
     item_id: str,
-    db: DbSession,
-    principal: UserPrincipal = Depends(get_current_user),
+    _: AuthenticatedContextDep,
 ) -> Response:
-    precheck = await _prepare_idempotency(request, db, principal)
+    precheck = await _prepare_idempotency(request)
     if precheck.replay is not None:
         return precheck.replay.to_http_response()
 
-    await delete_item_for_user(db, principal, list_id, item_id)
+    await delete_item_for_user(list_id, item_id)
     replay = await _persist_idempotency(
-        db,
         precheck,
         status_code=status.HTTP_204_NO_CONTENT,
         response_body=None,
@@ -246,16 +235,14 @@ async def remove_list_item(
 async def reset_list(
     request: Request,
     list_id: str,
-    db: DbSession,
-    principal: UserPrincipal = Depends(get_current_user),
+    _: AuthenticatedContextDep,
 ) -> ListResetResponse | Response:
-    precheck = await _prepare_idempotency(request, db, principal)
+    precheck = await _prepare_idempotency(request)
     if precheck.replay is not None:
         return precheck.replay.to_http_response()
 
-    reset_result = await reset_list_for_user(db, principal, list_id)
+    reset_result = await reset_list_for_user(list_id)
     replay = await _persist_idempotency(
-        db,
         precheck,
         status_code=status.HTTP_200_OK,
         response_body=_as_response_body(reset_result),
@@ -269,16 +256,14 @@ async def reset_list(
 async def restore_latest(
     request: Request,
     list_id: str,
-    db: DbSession,
-    principal: UserPrincipal = Depends(get_current_user),
+    _: AuthenticatedContextDep,
 ) -> ListRestoreLatestResponse | Response:
-    precheck = await _prepare_idempotency(request, db, principal)
+    precheck = await _prepare_idempotency(request)
     if precheck.replay is not None:
         return precheck.replay.to_http_response()
 
-    restore_result = await restore_latest_for_user(db, principal, list_id)
+    restore_result = await restore_latest_for_user(list_id)
     replay = await _persist_idempotency(
-        db,
         precheck,
         status_code=status.HTTP_200_OK,
         response_body=_as_response_body(restore_result),

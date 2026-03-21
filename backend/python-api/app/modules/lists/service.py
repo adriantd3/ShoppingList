@@ -1,7 +1,5 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.core.errors import ApiError, ErrorCode
-from app.modules.auth.schemas import UserPrincipal
+from app.core.request_context import get_request_context
 from app.modules.lists import repository
 from app.modules.lists.schemas import (
     ListCreateRequest,
@@ -13,14 +11,29 @@ from app.modules.lists.schemas import (
     ListRestoreLatestResponse,
     ListUpdateRequest,
 )
+from app.modules.realtime.events import (
+    EVENT_ITEM_CREATED,
+    EVENT_ITEM_DELETED,
+    EVENT_ITEM_PURCHASED_TOGGLED,
+    EVENT_ITEM_UPDATED,
+    EVENT_LIST_RESET_PERFORMED,
+    EVENT_LIST_RESTORE_PERFORMED,
+)
+from app.modules.realtime.service import emit_list_event
 
 
-async def list_lists_for_user(db: AsyncSession, principal: UserPrincipal) -> list[ListResponse]:
+async def list_lists_for_user() -> list[ListResponse]:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_lists = await repository.list_user_lists(db, user_id=principal.user_id)
     return [ListResponse.model_validate(item) for item in shopping_lists]
 
 
-async def create_list_for_user(db: AsyncSession, principal: UserPrincipal, payload: ListCreateRequest) -> ListResponse:
+async def create_list_for_user(payload: ListCreateRequest) -> ListResponse:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_list = await repository.create_list(
         db,
         name=payload.name.strip(),
@@ -29,7 +42,10 @@ async def create_list_for_user(db: AsyncSession, principal: UserPrincipal, paylo
     return ListResponse.model_validate(shopping_list)
 
 
-async def get_list_for_user(db: AsyncSession, principal: UserPrincipal, list_id: str) -> ListResponse:
+async def get_list_for_user(list_id: str) -> ListResponse:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
     if shopping_list is None:
         raise ApiError(
@@ -41,11 +57,12 @@ async def get_list_for_user(db: AsyncSession, principal: UserPrincipal, list_id:
 
 
 async def update_list_for_user(
-    db: AsyncSession,
-    principal: UserPrincipal,
     list_id: str,
     payload: ListUpdateRequest,
 ) -> ListResponse:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
     if shopping_list is None:
         raise ApiError(
@@ -57,7 +74,10 @@ async def update_list_for_user(
     return ListResponse.model_validate(updated)
 
 
-async def delete_list_for_user(db: AsyncSession, principal: UserPrincipal, list_id: str) -> None:
+async def delete_list_for_user(list_id: str) -> None:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
     if shopping_list is None:
         raise ApiError(
@@ -68,7 +88,10 @@ async def delete_list_for_user(db: AsyncSession, principal: UserPrincipal, list_
     await repository.delete_list(db, shopping_list)
 
 
-async def list_items_for_user(db: AsyncSession, principal: UserPrincipal, list_id: str) -> list[ListItemResponse]:
+async def list_items_for_user(list_id: str) -> list[ListItemResponse]:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
     if shopping_list is None:
         raise ApiError(
@@ -81,11 +104,12 @@ async def list_items_for_user(db: AsyncSession, principal: UserPrincipal, list_i
 
 
 async def create_item_for_user(
-    db: AsyncSession,
-    principal: UserPrincipal,
     list_id: str,
     payload: ListItemCreateRequest,
 ) -> ListItemResponse:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
     if shopping_list is None:
         raise ApiError(
@@ -110,16 +134,24 @@ async def create_item_for_user(
         is_purchased=payload.is_purchased,
         sort_index=sort_index,
     )
+    await emit_list_event(
+        db,
+        list_id=list_id,
+        actor_user_id=principal.user_id,
+        event_type=EVENT_ITEM_CREATED,
+        payload={"item_id": item.id},
+    )
     return ListItemResponse.model_validate(item)
 
 
 async def update_item_for_user(
-    db: AsyncSession,
-    principal: UserPrincipal,
     list_id: str,
     item_id: str,
     payload: ListItemUpdateRequest,
 ) -> ListItemResponse:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
     if shopping_list is None:
         raise ApiError(
@@ -139,6 +171,7 @@ async def update_item_for_user(
     changes = payload.model_dump(exclude_unset=True)
     if "name" in changes and isinstance(changes["name"], str):
         changes["name"] = changes["name"].strip()
+    previous_is_purchased = item.is_purchased
 
     updated = await repository.update_item(
         db,
@@ -146,10 +179,25 @@ async def update_item_for_user(
         actor_user_id=principal.user_id,
         changes=changes,
     )
+
+    event_type = EVENT_ITEM_UPDATED
+    if "is_purchased" in changes and previous_is_purchased != updated.is_purchased:
+        event_type = EVENT_ITEM_PURCHASED_TOGGLED
+
+    await emit_list_event(
+        db,
+        list_id=list_id,
+        actor_user_id=principal.user_id,
+        event_type=event_type,
+        payload={"item_id": updated.id, "is_purchased": updated.is_purchased},
+    )
     return ListItemResponse.model_validate(updated)
 
 
-async def delete_item_for_user(db: AsyncSession, principal: UserPrincipal, list_id: str, item_id: str) -> None:
+async def delete_item_for_user(list_id: str, item_id: str) -> None:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
     if shopping_list is None:
         raise ApiError(
@@ -166,10 +214,21 @@ async def delete_item_for_user(db: AsyncSession, principal: UserPrincipal, list_
             status_code=404,
         )
 
+    deleted_item_id = item.id
     await repository.delete_item(db, item)
+    await emit_list_event(
+        db,
+        list_id=list_id,
+        actor_user_id=principal.user_id,
+        event_type=EVENT_ITEM_DELETED,
+        payload={"item_id": deleted_item_id},
+    )
 
 
-async def reset_list_for_user(db: AsyncSession, principal: UserPrincipal, list_id: str) -> ListResetResponse:
+async def reset_list_for_user(list_id: str) -> ListResetResponse:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
     if shopping_list is None:
         raise ApiError(
@@ -193,14 +252,25 @@ async def reset_list_for_user(db: AsyncSession, principal: UserPrincipal, list_i
             actor_user_id=principal.user_id,
         )
 
-    return ListResetResponse(
+    response = ListResetResponse(
         list_id=list_id,
         snapshot_id=snapshot.id,
         reset_items_count=reset_count,
     )
+    await emit_list_event(
+        db,
+        list_id=list_id,
+        actor_user_id=principal.user_id,
+        event_type=EVENT_LIST_RESET_PERFORMED,
+        payload=response.model_dump(),
+    )
+    return response
 
 
-async def restore_latest_for_user(db: AsyncSession, principal: UserPrincipal, list_id: str) -> ListRestoreLatestResponse:
+async def restore_latest_for_user(list_id: str) -> ListRestoreLatestResponse:
+    context = get_request_context()
+    db = context.db
+    principal = context.principal
     shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
     if shopping_list is None:
         raise ApiError(
@@ -228,8 +298,16 @@ async def restore_latest_for_user(db: AsyncSession, principal: UserPrincipal, li
             snapshot_items=snapshot_items,
         )
 
-    return ListRestoreLatestResponse(
+    response = ListRestoreLatestResponse(
         list_id=list_id,
         snapshot_id=snapshot.id,
         restored_items_count=restored_count,
     )
+    await emit_list_event(
+        db,
+        list_id=list_id,
+        actor_user_id=principal.user_id,
+        event_type=EVENT_LIST_RESTORE_PERFORMED,
+        payload=response.model_dump(),
+    )
+    return response

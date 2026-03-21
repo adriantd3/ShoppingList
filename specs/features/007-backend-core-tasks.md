@@ -67,25 +67,25 @@
   - Add restore-latest endpoint constrained to latest restorable snapshot.
   - Requirement: FR-backend-07
 
-- [ ] 11. Implement realtime event infrastructure
+- [x] 11. Implement realtime event infrastructure
   - Add event builder service and envelope schema.
   - Persist events and publish notifications via PostgreSQL LISTEN/NOTIFY.
   - Implement WebSocket channel auth and list membership checks.
   - Requirement: FR-backend-04, FR-backend-05
 
-- [ ] 12. Implement realtime list event emission
+- [x] 12. Implement realtime list event emission
   - Emit canonical events for item create/update/delete/toggle.
   - Emit events for reset/restore and membership changes.
   - Ensure versioned payload compatibility.
   - Requirement: FR-backend-04, FR-backend-07
 
-- [ ] 13. Implement profile and notifications endpoints
+- [x] 13. Implement profile and notifications endpoints
   - Add profile read/update endpoints.
   - Add notification preferences endpoints.
   - Add device push token registration endpoint.
   - Requirement: FR-backend-03
 
-- [ ] 14. Add API security hardening controls
+- [x] 14. Add API security hardening controls
   - Add abuse controls/rate-limits on auth and share-link endpoints.
   - Add request size/body limits and strict content-type handling.
   - Add security headers and CORS policy by environment.
@@ -250,3 +250,53 @@
 - Risks considered: accidental destructive reset, inconsistent restore source selection, and unauthorized reset actions.
 - Controls applied: list-membership authorization checks, transactional pre-reset snapshot persistence before mutation, restore constrained to latest `pre_reset` snapshot, and deterministic 404 when no restorable snapshot exists.
 - Residual risks: snapshot retention policy cleanup is not yet automated and requires future lifecycle hardening.
+
+## Milestone C Progress Notes (2026-03-21)
+- Task 11 executed (realtime event infrastructure):
+  - Added canonical realtime envelope schema and event persistence/publish service.
+  - Added PostgreSQL `NOTIFY` publish bridge and in-process websocket connection manager.
+  - Added websocket list channel route with bearer-token auth and list-membership authorization checks.
+  - Added unit/integration tests for realtime service and websocket access contract behavior.
+
+- Task 12 executed (realtime list event emission):
+  - Added canonical list event type catalog for item lifecycle, reset/restore, and membership change events.
+  - Emitted realtime events on item create/update/delete and purchased toggle semantics.
+  - Emitted realtime events for reset/restore flows and share-link membership join transitions.
+  - Added/updated unit tests covering event emission behavior and event type selection.
+
+- Task 13 executed (profile/notifications endpoints):
+  - Added `/profile` read/update endpoints.
+  - Added `/profile/notifications` read/update endpoints.
+  - Added `/profile/push-tokens` registration endpoint.
+  - Added notification/profile repository and service layer plus contract tests.
+
+- Task 14 executed (API security hardening):
+  - Added scoped in-memory rate limiting controls for auth and share-link endpoints.
+  - Added request body size guard and strict JSON content-type enforcement for payload-bearing mutating requests.
+  - Added baseline security response headers and environment-aware CORS behavior.
+  - Added integration tests for hardening controls (headers, content-type, size limits, rate limiting).
+
+- Validation evidence:
+  - `uv run ruff check .` -> pass
+  - `uv run mypy app tests` -> pass
+  - `uv run pytest -q` -> pass (52 passed, 3 warnings)
+
+### Security notes - Block 11 (Task 11: realtime infrastructure)
+- Risks considered: unauthorized websocket channel access, event spoofing from unauthenticated clients, and missing realtime audit trail.
+- Controls applied: websocket bearer token validation, membership authorization checks before channel acceptance, persisted realtime event records, and publish bridge through PostgreSQL notifications.
+- Residual risks: cross-process websocket fan-out from `LISTEN` subscribers is not yet implemented and remains part of future realtime integration hardening.
+
+### Security notes - Block 12 (Task 12: realtime emission)
+- Risks considered: inconsistent event semantics across list operations and missing membership transition notifications.
+- Controls applied: centralized canonical event type constants, deterministic emission for create/update/delete/toggle/reset/restore/member-joined operations, and test coverage for event selection.
+- Residual risks: ordering guarantees under concurrent multi-node writes are still pending dedicated realtime integration tests (Task 17).
+
+### Security notes - Block 13 (Task 13: profile/notifications)
+- Risks considered: unauthorized profile mutation and unvalidated push token registration payloads.
+- Controls applied: authenticated endpoint dependencies, strict request models for profile/preferences/token registration, and service-layer user resolution with safe auth error semantics.
+- Residual risks: push-token lifecycle cleanup and anti-abuse token registration controls are not yet automated.
+
+### Security notes - Block 14 (Task 14: API hardening)
+- Risks considered: auth/share-link brute-force abuse, oversized payload abuse, and insecure default API response headers.
+- Controls applied: endpoint-scoped rate limiting, max request-size guard, strict content-type checks for mutating payloads, baseline defensive security headers, and environment-aware CORS defaults.
+- Residual risks: in-memory rate limiting is process-local for MVP and should be replaced by distributed throttling for multi-instance deployments.

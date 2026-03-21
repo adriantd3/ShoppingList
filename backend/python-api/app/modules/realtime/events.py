@@ -1,0 +1,8 @@
+EVENT_ITEM_CREATED = "list.item.created"
+EVENT_ITEM_UPDATED = "list.item.updated"
+EVENT_ITEM_DELETED = "list.item.deleted"
+EVENT_ITEM_PURCHASED_TOGGLED = "list.item.purchased_toggled"
+EVENT_LIST_RESET_PERFORMED = "list.reset.performed"
+EVENT_LIST_RESTORE_PERFORMED = "list.restore.performed"
+EVENT_LIST_MEMBER_JOINED = "list.member.joined"
+EVENT_LIST_MEMBER_LEFT = "list.member.left"
