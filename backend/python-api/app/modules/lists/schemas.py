@@ -104,3 +104,15 @@ class ListItemResponse(BaseModel):
     sort_index: int
     updated_at: datetime
     updated_by_user_id: str
+
+
+class ListResetResponse(BaseModel):
+    list_id: str
+    snapshot_id: str
+    reset_items_count: int
+
+
+class ListRestoreLatestResponse(BaseModel):
+    list_id: str
+    snapshot_id: str
+    restored_items_count: int

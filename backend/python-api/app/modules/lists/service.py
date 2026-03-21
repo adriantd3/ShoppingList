@@ -8,7 +8,9 @@ from app.modules.lists.schemas import (
     ListItemCreateRequest,
     ListItemResponse,
     ListItemUpdateRequest,
+    ListResetResponse,
     ListResponse,
+    ListRestoreLatestResponse,
     ListUpdateRequest,
 )
 
@@ -165,3 +167,69 @@ async def delete_item_for_user(db: AsyncSession, principal: UserPrincipal, list_
         )
 
     await repository.delete_item(db, item)
+
+
+async def reset_list_for_user(db: AsyncSession, principal: UserPrincipal, list_id: str) -> ListResetResponse:
+    shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
+    if shopping_list is None:
+        raise ApiError(
+            code=ErrorCode.LIST_NOT_FOUND,
+            message="List not found",
+            status_code=404,
+        )
+
+    async with db.begin():
+        items = await repository.list_items(db, list_id=list_id)
+        snapshot_payload = {"items": repository.serialize_items_snapshot(items)}
+        snapshot = await repository.create_pre_reset_snapshot(
+            db,
+            list_id=list_id,
+            created_by_user_id=principal.user_id,
+            payload=snapshot_payload,
+        )
+        reset_count = await repository.reset_items_purchase_flags(
+            db,
+            list_id=list_id,
+            actor_user_id=principal.user_id,
+        )
+
+    return ListResetResponse(
+        list_id=list_id,
+        snapshot_id=snapshot.id,
+        reset_items_count=reset_count,
+    )
+
+
+async def restore_latest_for_user(db: AsyncSession, principal: UserPrincipal, list_id: str) -> ListRestoreLatestResponse:
+    shopping_list = await repository.get_list_for_member(db, list_id=list_id, user_id=principal.user_id)
+    if shopping_list is None:
+        raise ApiError(
+            code=ErrorCode.LIST_NOT_FOUND,
+            message="List not found",
+            status_code=404,
+        )
+
+    snapshot = await repository.get_latest_pre_reset_snapshot(db, list_id=list_id)
+    if snapshot is None:
+        raise ApiError(
+            code=ErrorCode.LIST_NOT_FOUND,
+            message="No restorable snapshot found",
+            status_code=404,
+        )
+
+    payload_items = snapshot.payload.get("items", []) if isinstance(snapshot.payload, dict) else []
+    snapshot_items = [item for item in payload_items if isinstance(item, dict)]
+
+    async with db.begin():
+        restored_count = await repository.replace_list_items_from_snapshot(
+            db,
+            list_id=list_id,
+            actor_user_id=principal.user_id,
+            snapshot_items=snapshot_items,
+        )
+
+    return ListRestoreLatestResponse(
+        list_id=list_id,
+        snapshot_id=snapshot.id,
+        restored_items_count=restored_count,
+    )

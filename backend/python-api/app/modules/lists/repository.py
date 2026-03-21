@@ -1,9 +1,10 @@
 from decimal import Decimal
+from typing import cast
 
-from sqlalchemy import Select, func, select
+from sqlalchemy import Select, delete, desc, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import ListItem, ListMembership, ShoppingList
+from app.db.models import ListItem, ListMembership, ListSnapshot, ShoppingList
 
 
 async def get_membership_role(db: AsyncSession, list_id: str, user_id: str) -> str | None:
@@ -136,3 +137,92 @@ async def update_item(db: AsyncSession, item: ListItem, *, actor_user_id: str, c
 async def delete_item(db: AsyncSession, item: ListItem) -> None:
     await db.delete(item)
     await db.commit()
+
+
+def serialize_items_snapshot(items: list[ListItem]) -> list[dict[str, object]]:
+    return [
+        {
+            "name": item.name,
+            "quantity": str(item.quantity),
+            "unit": item.unit,
+            "category": item.category,
+            "note": item.note,
+            "is_purchased": item.is_purchased,
+            "is_template_item": item.is_template_item,
+            "sort_index": item.sort_index,
+        }
+        for item in items
+    ]
+
+
+async def create_pre_reset_snapshot(
+    db: AsyncSession,
+    *,
+    list_id: str,
+    created_by_user_id: str,
+    payload: dict,
+) -> ListSnapshot:
+    snapshot = ListSnapshot(
+        list_id=list_id,
+        snapshot_type="pre_reset",
+        payload=payload,
+        created_by_user_id=created_by_user_id,
+    )
+    db.add(snapshot)
+    await db.flush()
+    return snapshot
+
+
+async def reset_items_purchase_flags(db: AsyncSession, *, list_id: str, actor_user_id: str) -> int:
+    count_stmt = select(func.count()).select_from(ListItem).where(ListItem.list_id == list_id)
+    count_result = await db.execute(count_stmt)
+    affected = int(count_result.scalar_one())
+
+    stmt = (
+        update(ListItem)
+        .where(ListItem.list_id == list_id)
+        .values(is_purchased=False, updated_by_user_id=actor_user_id)
+    )
+    await db.execute(stmt)
+    return affected
+
+
+async def get_latest_pre_reset_snapshot(db: AsyncSession, *, list_id: str) -> ListSnapshot | None:
+    stmt: Select[tuple[ListSnapshot]] = (
+        select(ListSnapshot)
+        .where(ListSnapshot.list_id == list_id)
+        .where(ListSnapshot.snapshot_type == "pre_reset")
+        .order_by(desc(ListSnapshot.created_at), desc(ListSnapshot.id))
+    )
+    result = await db.execute(stmt)
+    return result.scalar_one_or_none()
+
+
+async def replace_list_items_from_snapshot(
+    db: AsyncSession,
+    *,
+    list_id: str,
+    actor_user_id: str,
+    snapshot_items: list[dict[str, object]],
+) -> int:
+    await db.execute(delete(ListItem).where(ListItem.list_id == list_id))
+
+    for item in snapshot_items:
+        quantity = cast(str, item["quantity"])
+        sort_index_raw = item.get("sort_index", 0)
+        restored_item = ListItem(
+            list_id=list_id,
+            name=str(item["name"]),
+            quantity=Decimal(quantity),
+            unit=str(item["unit"]),
+            category=str(item["category"]),
+            note=str(item["note"]) if item.get("note") is not None else None,
+            is_purchased=bool(item.get("is_purchased", False)),
+            is_template_item=bool(item.get("is_template_item", False)),
+            sort_index=int(cast(int, sort_index_raw)),
+            updated_by_user_id=actor_user_id,
+        )
+        db.add(restored_item)
+
+    await db.flush()
+    return len(snapshot_items)

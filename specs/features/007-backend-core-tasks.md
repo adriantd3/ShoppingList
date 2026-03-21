@@ -61,7 +61,7 @@
   - Add audit metadata for creator, timestamps, and revoke actor.
   - Requirement: FR-backend-03, FR-backend-09
 
-- [ ] 10. Implement reset and quick-restore backend semantics
+- [x] 10. Implement reset and quick-restore backend semantics
   - Add transactional pre-reset snapshot creation.
   - Add reset command behavior according to MVP policy.
   - Add restore-latest endpoint constrained to latest restorable snapshot.
@@ -220,6 +220,17 @@
     - `uv run mypy app tests` -> pass
     - `uv run pytest` -> pass (28 passed, 3 warnings)
 
+- Task 10 executed (reset and quick-restore semantics):
+  - Added reset endpoint contract with transactional pre-reset snapshot creation.
+  - Implemented reset behavior using MVP policy (`keep-and-uncheck` items).
+  - Added restore-latest endpoint constrained to latest `pre_reset` snapshot.
+  - Added list snapshot repository operations and reset/restore service orchestration.
+  - Added unit and integration tests for reset/restore contract and service behavior.
+  - Validation evidence:
+    - `uv run ruff check .` -> pass
+    - `uv run mypy app tests` -> pass
+    - `uv run pytest` -> pass (33 passed, 3 warnings)
+
 ### Security notes - Block 7 (Task 7: lists/items contracts)
 - Risks considered: broken access control, malformed input leading to inconsistent state, error response leakage.
 - Controls applied: authenticated route dependencies, strict schema validation with forbidden unknown fields, deterministic item ordering, safe validation error serialization.
@@ -234,3 +245,8 @@
 - Risks considered: unauthorized list joining through leaked links, replay of revoked links, and accidental plaintext token persistence.
 - Controls applied: authenticated consume flow, membership checks for issue/revoke/expire operations, token hashing before persistence, explicit revoked/expired conflict handling with stable error codes, and revoke-actor audit metadata.
 - Residual risks: no rate-limiting yet on share-link operations; abuse controls remain in Milestone C hardening.
+
+### Security notes - Block 10 (Task 10: reset/restore)
+- Risks considered: accidental destructive reset, inconsistent restore source selection, and unauthorized reset actions.
+- Controls applied: list-membership authorization checks, transactional pre-reset snapshot persistence before mutation, restore constrained to latest `pre_reset` snapshot, and deterministic 404 when no restorable snapshot exists.
+- Residual risks: snapshot retention policy cleanup is not yet automated and requires future lifecycle hardening.

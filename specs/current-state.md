@@ -54,7 +54,7 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - No frontend migration execution yet from existing UI components to Tamagui.
 - UI screen-map, technical design, and implementation task breakdown are defined for feature 006.
 - No explicit performance/load validation runs yet for NFR targets.
-- Feature 007 tasks 10-20 remain pending (reset/restore, realtime, hardening, full contract/integration/realtime suites).
+- Feature 007 tasks 11-20 remain pending (realtime, hardening, full contract/integration/realtime suites).
 
 ## Traceability Update (Feature 007 Milestone A-B)
 - FR-backend-11, NFR-01, NFR-03
@@ -78,11 +78,14 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - FR-backend-03, FR-backend-09 (Milestone B - Task 9)
 	- Code: `backend/python-api/app/api/rest/v1/endpoints/sharing.py`, `backend/python-api/app/modules/sharing/schemas.py`, `backend/python-api/app/modules/sharing/repository.py`, `backend/python-api/app/modules/sharing/service.py`, `backend/python-api/app/db/models.py`, `backend/python-api/migrations/versions/20260321_0003_task9_share_links_audit.py`, `backend/python-api/app/api/rest/v1/router.py`
 	- Tests: `backend/python-api/tests/integration/sharing/test_sharing_contract.py`, `backend/python-api/tests/unit/sharing/test_service.py`
+- FR-backend-03, FR-backend-07 (Milestone B - Task 10)
+	- Code: `backend/python-api/app/api/rest/v1/endpoints/lists.py`, `backend/python-api/app/modules/lists/schemas.py`, `backend/python-api/app/modules/lists/service.py`, `backend/python-api/app/modules/lists/repository.py`
+	- Tests: `backend/python-api/tests/integration/lists/test_reset_restore_contract.py`, `backend/python-api/tests/unit/lists/test_reset_restore_service.py`
 
-## Validation Evidence (Task 8-9)
+## Validation Evidence (Task 8-10)
 - `uv run ruff check .` -> pass
 - `uv run mypy app tests` -> pass
-- `uv run pytest` -> pass (28 passed, 3 warnings)
+- `uv run pytest` -> pass (33 passed, 3 warnings)
 
 ## Security Notes (Task 8)
 - Risks considered: duplicate replayed mutations, ambiguous idempotency key reuse with altered payloads, and replay-store growth.
@@ -94,6 +97,11 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - Controls applied: token hash-only persistence, authenticated consume path with deterministic revoked/expired conflict responses, membership checks on issue/revoke/expire operations, and revocation actor audit metadata.
 - Residual risks: share-link abuse controls and rate limiting remain pending Milestone C hardening.
 
+## Security Notes (Task 10)
+- Risks considered: accidental or concurrent reset misuse, restore to stale state, and unauthorized reset/restore operations.
+- Controls applied: transactional pre-reset snapshot creation before reset mutation, restore constrained to latest pre-reset snapshot, membership checks on reset/restore endpoints, and deterministic error response when no snapshot exists.
+- Residual risks: snapshot pruning/retention automation is pending future hardening work.
+
 ## Next Actions
 1. Create implementation plan per feature with impact labels:
 	- `001-auth`: full-stack
@@ -101,7 +109,7 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- `003-shared-realtime-list`: full-stack
 	- `004-template-and-reset`: full-stack
 	- `005-platform-and-stack`: backend + frontend + devops
-2. Continue Milestone B for feature 007 (task 10): reset/restore semantics.
+2. Continue Milestone C for feature 007 (tasks 11-14): realtime infrastructure and security hardening.
 3. Define Tamagui design tokens and base component layer for React Native screens.
 4. Begin phase-4 execution for `006-ui-screen-map` following `006-ui-screen-map-tasks.md`.
 5. Implement auth and list domains first (`001`, `002`) to unlock MVP usage.

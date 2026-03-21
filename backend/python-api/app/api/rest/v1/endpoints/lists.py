@@ -13,7 +13,9 @@ from app.modules.lists.schemas import (
     ListItemCreateRequest,
     ListItemResponse,
     ListItemUpdateRequest,
+    ListResetResponse,
     ListResponse,
+    ListRestoreLatestResponse,
     ListUpdateRequest,
 )
 from app.modules.lists.service import (
@@ -24,6 +26,8 @@ from app.modules.lists.service import (
     get_list_for_user,
     list_items_for_user,
     list_lists_for_user,
+    reset_list_for_user,
+    restore_latest_for_user,
     update_item_for_user,
     update_list_for_user,
 )
@@ -236,3 +240,49 @@ async def remove_list_item(
     if replay is not None:
         return replay
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/{list_id}/reset", response_model=ListResetResponse)
+async def reset_list(
+    request: Request,
+    list_id: str,
+    db: DbSession,
+    principal: UserPrincipal = Depends(get_current_user),
+) -> ListResetResponse | Response:
+    precheck = await _prepare_idempotency(request, db, principal)
+    if precheck.replay is not None:
+        return precheck.replay.to_http_response()
+
+    reset_result = await reset_list_for_user(db, principal, list_id)
+    replay = await _persist_idempotency(
+        db,
+        precheck,
+        status_code=status.HTTP_200_OK,
+        response_body=_as_response_body(reset_result),
+    )
+    if replay is not None:
+        return replay
+    return reset_result
+
+
+@router.post("/{list_id}/restore-latest", response_model=ListRestoreLatestResponse)
+async def restore_latest(
+    request: Request,
+    list_id: str,
+    db: DbSession,
+    principal: UserPrincipal = Depends(get_current_user),
+) -> ListRestoreLatestResponse | Response:
+    precheck = await _prepare_idempotency(request, db, principal)
+    if precheck.replay is not None:
+        return precheck.replay.to_http_response()
+
+    restore_result = await restore_latest_for_user(db, principal, list_id)
+    replay = await _persist_idempotency(
+        db,
+        precheck,
+        status_code=status.HTTP_200_OK,
+        response_body=_as_response_body(restore_result),
+    )
+    if replay is not None:
+        return replay
+    return restore_result
