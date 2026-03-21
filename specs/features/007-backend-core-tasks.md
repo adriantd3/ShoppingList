@@ -7,37 +7,37 @@
 
 ## Tasks
 
-- [ ] 1. Create backend workspace skeleton
+- [x] 1. Create backend workspace skeleton
   - Create `backend/python-api` structure aligned with module boundaries in design.
   - Add FastAPI app bootstrap, config loading, and environment profiles.
   - Define baseline CI scripts: lint, typecheck, test.
   - Requirement: FR-backend-11, NFR-01, NFR-03
 
-- [ ] 2. Configure security and secrets baseline
+- [x] 2. Configure security and secrets baseline
   - Implement secret loading from environment only.
   - Add secure logging redaction for tokens, credentials, and PII.
   - Add transport/security defaults and production-safe configuration toggles.
   - Requirement: FR-backend-10, NFR-02
 
-- [ ] 3. Implement database foundation and migrations
+- [x] 3. Implement database foundation and migrations
   - Create SQLAlchemy models for all MVP entities.
   - Add Alembic migration baseline with foreign keys, uniqueness, and indexes.
   - Add integrity constraints for ownership and membership semantics.
   - Requirement: FR-backend-01, FR-backend-02, NFR-01
 
-- [ ] 4. Implement authentication core
+- [x] 4. Implement authentication core
   - Add email/password auth and JWT issue/verify flow.
   - Add OAuth identity linkage model and service contracts.
   - Implement auth middleware/dependencies for REST and WebSocket paths.
   - Requirement: FR-backend-03, FR-backend-05, FR-platform-06
 
-- [ ] 5. Implement authorization policy layer
+- [x] 5. Implement authorization policy layer
   - Centralize permission checks for owner/member/non-member actions.
   - Enforce least privilege by endpoint and list resource.
   - Add deny-by-default behavior for non-members.
   - Requirement: FR-backend-05
 
-- [ ] 6. Implement error contract standardization
+- [x] 6. Implement error contract standardization
   - Add centralized exception mapping to machine-readable error codes.
   - Ensure safe messages in production responses.
   - Add trace_id correlation in all error responses.
@@ -144,3 +144,44 @@
 - Remaining risks (to validate during implementation):
   - Performance impact of idempotency storage under burst replay.
   - Event ordering edge cases during high concurrency.
+
+## Milestone A Execution Notes (2026-03-21)
+- Validation evidence:
+  - `uv run ruff check .` -> pass
+  - `uv run mypy app tests` -> pass
+  - `uv run pytest` -> pass (5 passed, 1 deprecation warning from Starlette constant)
+- Requirement-to-code-to-test traceability:
+  - FR-backend-11, NFR-01, NFR-03 -> `backend/python-api/app/main.py`, `backend/python-api/pyproject.toml` -> `backend/python-api/tests/test_health.py`
+  - FR-backend-10, NFR-02 -> `backend/python-api/app/core/config.py`, `backend/python-api/app/core/logging.py`, `backend/python-api/app/core/errors.py` -> `backend/python-api/tests/test_error_contract.py`
+  - FR-backend-01, FR-backend-02 -> `backend/python-api/app/db/models.py`, `backend/python-api/migrations/versions/20260321_0001_backend_core_baseline.py` -> foundation validated by app import/type checks
+  - FR-backend-03, FR-backend-05 -> `backend/python-api/app/modules/auth/*`, `backend/python-api/app/modules/lists/policies.py`, `backend/python-api/app/api/ws/auth.py` -> `backend/python-api/tests/test_security.py`, `backend/python-api/tests/test_error_contract.py`
+
+### Security notes - Block 1 (Task 1: skeleton)
+- Risks considered: weak baseline structure causing ad-hoc auth/error handling and drift from contracts.
+- Controls applied: module boundaries aligned to design; mandatory validation commands wired in project config.
+- Residual risks: websocket and realtime modules are scaffolds only; behavior-level controls are pending later milestones.
+
+### Security notes - Block 2 (Task 2: security/secrets baseline)
+- Risks considered: hardcoded secrets, sensitive log leakage, unsafe prod toggles.
+- Controls applied: `Settings` loads from environment, JWT minimum length enforced, production guards (`debug/docs/cors`) enforced, sensitive log redaction filter added.
+- Residual risks: no KMS/secret rotation yet; secure secret distribution remains deployment responsibility.
+
+### Security notes - Block 3 (Task 3: DB foundation)
+- Risks considered: broken referential integrity, ownership bypass through orphan records, migration drift.
+- Controls applied: normalized SQLAlchemy models with FK/unique constraints; Alembic baseline migration created with deterministic naming conventions.
+- Residual risks: owner-membership invariant is not yet enforced by trigger/check constraint and will be addressed in domain operations.
+
+### Security notes - Block 4 (Task 4: auth core)
+- Risks considered: credential brute-force abuse, token forgery, invalid token reuse.
+- Controls applied: secure password hashing (PBKDF2), JWT signed tokens with exp/iat/jti required claims, strict token decode errors, REST+WebSocket auth helpers.
+- Residual risks: rate limiting and refresh-token rotation are pending Milestone C hardening tasks.
+
+### Security notes - Block 5 (Task 5: authorization)
+- Risks considered: broken access control / IDOR on list resources.
+- Controls applied: centralized list policy functions (`require_list_membership`, `require_list_owner`) with deny-by-default behavior.
+- Residual risks: policy is currently role-string based; richer permission matrix enforcement per action is pending in feature endpoints.
+
+### Security notes - Block 6 (Task 6: error contract)
+- Risks considered: internal info leakage, inconsistent frontend handling, missing traceability for incidents.
+- Controls applied: centralized `ApiError` mapping with stable machine-readable codes, safe production message policy, `trace_id` in headers and body.
+- Residual risks: centralized audit/event logging for incident pipelines is pending.

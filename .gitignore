@@ -40,6 +40,15 @@ frontend/Dutylist/coverage/
 # Python caches (tooling)
 **/__pycache__/
 **/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.cache/
+**/.hypothesis/
+**/.pytype/
+**/.tox/
+**/.nox/
+**/.venv/
+**/venv/
 
 # Agent/local AI tooling (do not track external/local skills)
 .agents/
