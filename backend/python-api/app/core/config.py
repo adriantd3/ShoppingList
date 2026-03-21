@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     enable_docs: bool = True
 
     log_level: str = "INFO"
+    idempotency_replay_ttl_minutes: int = 1440
 
     model_config = SettingsConfigDict(
         env_file=None,
@@ -50,6 +51,9 @@ class Settings(BaseSettings):
                 raise ValueError("enable_docs must be false in production")
             if not self.cors_allow_origins:
                 raise ValueError("cors_allow_origins cannot be empty in production")
+
+        if self.idempotency_replay_ttl_minutes <= 0:
+            raise ValueError("idempotency_replay_ttl_minutes must be greater than 0")
 
         return self
 

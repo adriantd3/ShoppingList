@@ -49,7 +49,7 @@
   - Implement deterministic sort/index behavior for list items.
   - Requirement: FR-backend-03, FR-backend-08
 
-- [ ] 8. Implement idempotency and offline replay support
+- [x] 8. Implement idempotency and offline replay support
   - Add `Idempotency-Key` middleware/dependency for mutating endpoints.
   - Persist operation fingerprints and replay windows.
   - Return deterministic responses for duplicate and conflicting replays.
@@ -197,7 +197,24 @@
     - `uv run mypy app tests` -> pass
     - `uv run pytest` -> pass (8 passed)
 
+- Task 8 executed (idempotency and offline replay):
+  - Added `Idempotency-Key` handling for mutating list/item endpoints with optional header semantics.
+  - Added persistent idempotency records with payload fingerprint, stored response, and replay TTL window.
+  - Added deterministic replay behavior:
+    - same key + same payload -> replay stored response
+    - same key + different payload -> `409 IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD`
+  - Added unit and integration tests covering replay and conflict behavior.
+  - Validation evidence:
+    - `uv run ruff check .` -> pass
+    - `uv run mypy app tests` -> pass
+    - `uv run pytest` -> pass (21 passed, 3 warnings)
+
 ### Security notes - Block 7 (Task 7: lists/items contracts)
 - Risks considered: broken access control, malformed input leading to inconsistent state, error response leakage.
 - Controls applied: authenticated route dependencies, strict schema validation with forbidden unknown fields, deterministic item ordering, safe validation error serialization.
 - Residual risks: endpoint-level rate limiting and payload size throttling remain scheduled for Milestone C hardening.
+
+### Security notes - Block 8 (Task 8: idempotency)
+- Risks considered: duplicate offline replays causing repeated mutations, key reuse ambiguity across payloads, and unbounded replay storage growth.
+- Controls applied: request-scoped idempotency key handling on mutating list/item endpoints, SHA-256 payload fingerprinting, deterministic conflict response (`409` + stable error code), persistent response replay with configurable TTL.
+- Residual risks: concurrent first-write races can still execute duplicate side effects under high contention and will require additional locking/rate controls in future hardening milestones.

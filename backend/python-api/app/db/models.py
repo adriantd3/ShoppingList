@@ -94,6 +94,29 @@ class RealtimeEvent(UUIDPrimaryKeyMixin, Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
 
 
+class IdempotencyRecord(UUIDPrimaryKeyMixin, Base):
+    __tablename__ = "idempotency_records"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "request_method",
+            "request_path",
+            "idempotency_key",
+            name="uq_idempotency_records_user_scope_key",
+        ),
+    )
+
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    request_method: Mapped[str] = mapped_column(String(10), nullable=False)
+    request_path: Mapped[str] = mapped_column(String(255), nullable=False)
+    idempotency_key: Mapped[str] = mapped_column(String(128), nullable=False)
+    payload_fingerprint: Mapped[str] = mapped_column(String(64), nullable=False)
+    response_status_code: Mapped[int] = mapped_column(Integer, nullable=False)
+    response_body: Mapped[dict | list | None] = mapped_column(JSONB, nullable=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
+
+
 class NotificationPreference(Base):
     __tablename__ = "notification_preferences"
 
