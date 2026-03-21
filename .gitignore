@@ -1,9 +1,51 @@
-# Archivos basura de VisualParadigm
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
 
-Docs/*.vpp.bak*
+# Logs / temp files
+*.log
+*.tmp
+*.temp
+
+# Local environment and secrets
 .env
+.env.*
+!.env.example
+
+# Visual Paradigm backups
+Docs/*.vpp.bak*
+
+# Project-specific sensitive/generated files
 backend/microservices/openapi-generator-cli-7.9.0.jar
 /backend/microservices/products/.idea
-/backend/microservices/products/target
-/backend/microservices/products/target
 backend/microservices/users/src/main/resources/firebase-service-account.json
+
+# Node / Expo
+**/node_modules/
+frontend/Dutylist/.expo/
+frontend/Dutylist/.expo-shared/
+frontend/Dutylist/web-build/
+frontend/Dutylist/dist/
+frontend/Dutylist/.next/
+frontend/Dutylist/.turbo/
+frontend/Dutylist/coverage/
+
+# Java / Maven / Spring
+**/target/
+**/.mvn/wrapper/maven-wrapper.jar
+
+# Python caches (tooling)
+**/__pycache__/
+**/.pytest_cache/
+
+# Agent/local AI tooling (do not track external/local skills)
+.agents/
+copilot-instructions.md
+skills-lock.json
+
+# Keep repository guidance and specs tracked
+!.github/
+!specs/
