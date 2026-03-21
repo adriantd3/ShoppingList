@@ -1,0 +1,490 @@
+{
+  "info": {
+    "_postman_id": "f0f0ed3a-7f31-4d6e-86d1-0e89bf5c9ca9",
+    "name": "ShoppingList Python API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Native Postman collection with automatic JWT capture and reuse across protected endpoints."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:8000" },
+    { "key": "jwt_token", "value": "" },
+    { "key": "list_id", "value": "list-1" },
+    { "key": "item_id", "value": "item-1" },
+    { "key": "share_link_id", "value": "link-1" },
+    { "key": "share_token", "value": "" }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const path = pm.request.url.getPath();",
+          "const isPublic = path.endsWith('/auth/login') || path.endsWith('/health');",
+          "if (isPublic) {",
+          "  pm.request.auth = { type: 'noauth' };",
+          "  pm.request.headers.remove('Authorization');",
+          "  return;",
+          "}",
+          "const token = pm.collectionVariables.get('jwt_token');",
+          "if (token) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${token}` });",
+          "} else {",
+          "  pm.request.headers.remove('Authorization');",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "health"]
+        }
+      }
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login returns access token', function () {",
+                  "  const data = pm.response.json();",
+                  "  pm.expect(data).to.have.property('access_token');",
+                  "  pm.expect(data.access_token).to.be.a('string').and.not.empty;",
+                  "});",
+                  "const data = pm.response.json();",
+                  "if (data && data.access_token) {",
+                  "  pm.collectionVariables.set('jwt_token', data.access_token);",
+                  "  pm.environment.set('jwt_token', data.access_token);",
+                  "}",
+                  "pm.test('jwt_token is stored', function () {",
+                  "  pm.expect(pm.collectionVariables.get('jwt_token')).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@shoppinglist.dev\",\n  \"password\": \"DemoPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lists",
+      "item": [
+        {
+          "name": "Get Lists",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists"]
+            }
+          }
+        },
+        {
+          "name": "Create List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  if (body && body.id) {",
+                  "    pm.collectionVariables.set('list_id', body.id);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "create-list-{{$timestamp}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Weekly Groceries\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists"]
+            }
+          }
+        },
+        {
+          "name": "Get List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Patch List",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "patch-list-{{$timestamp}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Weekly Groceries Updated\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete List",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Idempotency-Key", "value": "delete-list-{{$timestamp}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get List Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}", "items"]
+            }
+          }
+        },
+        {
+          "name": "Create List Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  if (body && body.id) {",
+                  "    pm.collectionVariables.set('item_id', body.id);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "create-item-{{$timestamp}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Milk\",\n  \"quantity\": 2,\n  \"unit\": \"L\",\n  \"category\": \"dairy\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}", "items"]
+            }
+          }
+        },
+        {
+          "name": "Patch List Item",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "patch-item-{{$timestamp}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"is_purchased\": true\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}/items/{{item_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}", "items", "{{item_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete List Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Idempotency-Key", "value": "delete-item-{{$timestamp}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}/items/{{item_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}", "items", "{{item_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Reset List",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Idempotency-Key", "value": "reset-list-{{$timestamp}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}/reset",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}", "reset"]
+            }
+          }
+        },
+        {
+          "name": "Restore Latest",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Idempotency-Key", "value": "restore-list-{{$timestamp}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}/restore-latest",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}", "restore-latest"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sharing",
+      "item": [
+        {
+          "name": "Issue Share Link",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  if (body && body.link && body.link.id) {",
+                  "    pm.collectionVariables.set('share_link_id', body.link.id);",
+                  "  }",
+                  "  if (body && body.token) {",
+                  "    pm.collectionVariables.set('share_token', body.token);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"expires_in_minutes\": 120\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}/share-links",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}", "share-links"]
+            }
+          }
+        },
+        {
+          "name": "Revoke Share Link",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}/share-links/{{share_link_id}}/revoke",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}", "share-links", "{{share_link_id}}", "revoke"]
+            }
+          }
+        },
+        {
+          "name": "Expire Share Link",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}/share-links/{{share_link_id}}/expire",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}", "share-links", "{{share_link_id}}", "expire"]
+            }
+          }
+        },
+        {
+          "name": "Consume Share Link",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"token\": \"{{share_token}}\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/share-links/consume",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "share-links", "consume"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Patch Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"display_name\": \"Demo User Updated\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Get Notification Preferences",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "notifications"]
+            }
+          }
+        },
+        {
+          "name": "Patch Notification Preferences",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"list_change_push_enabled\": true\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "notifications"]
+            }
+          }
+        },
+        {
+          "name": "Register Push Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"platform\": \"android\",\n  \"push_token\": \"ExponentPushToken[xxxxxxxxxxxxxxxxxxxx]\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/push-tokens",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "push-tokens"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Security",
+      "item": [
+        {
+          "name": "Member Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}/member-check",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}", "member-check"]
+            }
+          }
+        },
+        {
+          "name": "Owner Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lists/{{list_id}}/owner-check",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "lists", "{{list_id}}", "owner-check"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

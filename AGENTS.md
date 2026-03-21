@@ -16,6 +16,7 @@ Cross-provider defaults (apply regardless of agent provider):
 - For non-trivial tasks, plan first (3+ steps or architectural decisions).
 - Update specs before implementation and keep requirement-to-code-to-test traceability explicit.
 - Verify before done: tests/logs/diffs when relevant.
+- Do not rely only on automated tests for backend/API work; run the backend and perform quick manual smoke checks (login + one protected route).
 - For bug reports, reproduce and fix directly with minimal user context switching.
 - Prefer simple, minimal, root-cause fixes over temporary patches.
 

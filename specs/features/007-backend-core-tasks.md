@@ -91,37 +91,116 @@
   - Add security headers and CORS policy by environment.
   - Requirement: FR-backend-05, FR-backend-10, NFR-02
 
-- [ ] 15. Add contract test suite
-  - Validate request/response schemas and error code contracts.
-  - Validate WebSocket event envelope schema and type safety.
+- [x] 15. Add contract test suite
+  - Scope: close contract drift risk for REST and WebSocket surfaces delivered in tasks 7 to 14.
+  - Build endpoint contract matrix covering happy path + deterministic error paths for:
+    - Auth (`/auth/login`).
+    - Lists/items (`/lists`, `/lists/{list_id}`, `/lists/{list_id}/items/*`).
+    - Sharing (`/lists/{list_id}/share-links`, `/share-links/consume`).
+    - Profile/notifications (`/profile`, `/profile/notifications`, `/profile/push-tokens`).
+  - Add JSON shape assertions for standardized error contract (`error.code`, `error.message`, `error.details`, `error.trace_id`) and stable machine-readable codes.
+  - Add WebSocket envelope schema assertions (`event_id`, `event_type`, `list_id`, `occurred_at`, `actor_user_id`, `payload`, `version`) including invalid/unauthorized connection cases.
+  - Ensure OpenAPI-operation alignment checks are covered for implemented routes to prevent undocumented response drift.
+  - Deliverables:
+    - Contract test modules under `backend/python-api/tests/integration/**` for all shipped MVP routes.
+    - Reusable schema/assert helpers to keep test intent DRY and maintainable.
+  - Done criteria:
+    - Contract tests pass with no flaky timing assumptions.
+    - New/updated tests demonstrate explicit mapping to FR-backend-03, FR-backend-04, FR-backend-10, FR-backend-12.
   - Requirement: FR-backend-12, NFR-03
 
-- [ ] 16. Add integration test suite
-  - Test auth and authorization paths, including forbidden access.
-  - Test idempotency replay behavior and conflict responses.
-  - Test share-link lifecycle, reset/restore semantics, and membership transitions.
+- [x] 16. Add integration test suite
+  - Scope: verify multi-step domain behavior and cross-module invariants under realistic API usage.
+  - Add end-to-end integration scenarios for:
+    - AuthN/AuthZ: owner/member/non-member access matrix including `403` invariants.
+    - Idempotency: replay same payload and conflict on altered payload with same key.
+    - Sharing: issue, consume, expire, revoke lifecycle and post-revocation behavior.
+    - Reset/restore: snapshot creation before reset and restore-latest constraints.
+    - Membership transitions: user joins through share-link then receives authorized access.
+  - Add negative-path assertions for unauthorized list access, expired/revoked links, missing snapshots, and malformed payloads.
+  - Validate persistence side effects using repository/state checks where API-only assertions are insufficient.
+  - Deliverables:
+    - Integration suites under `backend/python-api/tests/integration/lists/`, `backend/python-api/tests/integration/sharing/`, and `backend/python-api/tests/integration/core/`.
+    - Shared fixture updates for deterministic setup/cleanup and role-based actors.
+  - Done criteria:
+    - Integration suites are deterministic and parallel-safe in local CI mode.
+    - Coverage proves FR-backend-05, FR-backend-06, FR-backend-07, FR-backend-09, FR-backend-12 behaviors from public API surfaces.
   - Requirement: FR-backend-05, FR-backend-06, FR-backend-07, FR-backend-09, FR-backend-12
 
-- [ ] 17. Add realtime integration tests
-  - Verify multi-client fan-out behavior.
-  - Verify ordering guarantees and eventual consistency under concurrent writes.
+- [x] 17. Add realtime integration tests
+  - Scope: validate realtime consistency guarantees for collaborative list editing.
+  - Add multi-client websocket integration scenarios:
+    - Multiple authorized clients subscribed to the same list receive canonical events.
+    - Unauthorized/non-member websocket clients are rejected deterministically.
+    - Membership-join transition followed by websocket subscribe succeeds.
+  - Add ordering and eventual-consistency checks:
+    - For sequential writes, receiving clients observe monotonic event order.
+    - For concurrent writes, clients converge to database-committed final state and event envelopes remain schema-valid.
+  - Add resilience checks for disconnect/reconnect and stale connection cleanup semantics.
+  - Deliverables:
+    - Realtime integration suite under `backend/python-api/tests/integration/core/`.
+    - Reusable websocket test harness helpers for auth/connect/receive assertions.
+  - Done criteria:
+    - Realtime suites pass consistently with bounded waits/timeouts.
+    - Evidence demonstrates FR-backend-04 and FR-backend-12 contract confidence for MVP single-instance runtime.
   - Requirement: FR-backend-04, FR-backend-12
 
-- [ ] 18. Add security review checklist evidence
-  - Run endpoint-level API security checklist across all routes.
-  - Record applied controls and remaining accepted risks.
-  - Add dependency hygiene review notes.
+- [x] 18. Add security review checklist evidence
+  - Scope: produce auditable endpoint-level security evidence for all implemented MVP backend routes.
+  - Execute API security checklist per route group (auth, lists/items, sharing, profile/notifications, websocket):
+    - Authentication enforcement present.
+    - Authorization checks aligned with membership/role policy.
+    - Input validation and content-type constraints enforced.
+    - Error responses avoid sensitive data leakage.
+    - Rate-limit/abuse controls applied where required.
+  - Capture dependency hygiene evidence:
+    - Run dependency vulnerability scan and record findings + disposition.
+    - Confirm no hardcoded secrets and environment-only secret sources.
+  - Record accepted residual risks with mitigation path and owner:
+    - Process-local rate limiting in multi-instance topology.
+    - Cross-process realtime fan-out hardening beyond MVP scope.
+  - Deliverables:
+    - Security evidence section appended to `specs/current-state.md`.
+    - Endpoint checklist artifact under `docs/` (or linked section in specs if docs path is not used).
+  - Done criteria:
+    - Each public route/event channel has explicit pass/fail checklist evidence.
+    - Residual risks are documented with rationale and follow-up direction.
   - Requirement: FR-backend-10, NFR-02
 
-- [ ] 19. Publish backend OpenAPI and WS contract docs
-  - Export OpenAPI with examples and error codes.
-  - Publish WebSocket event catalog with versioning policy.
-  - Link contracts into feature traceability.
+- [x] 19. Publish backend OpenAPI and WS contract docs
+  - Scope: publish implementation-aligned contracts as single source for frontend/backoffice integrations.
+  - Generate and persist backend OpenAPI snapshot from runtime app state.
+  - Ensure OpenAPI includes:
+    - Endpoint paths and auth requirements.
+    - Request/response examples for key routes.
+    - Standard error code examples and schema references.
+  - Publish WebSocket contract catalog including:
+    - Event type table with payload fields.
+    - Event envelope version policy and compatibility notes.
+    - Auth/connect requirements and expected rejection codes.
+  - Link published contract artifacts from feature 007 specs and current-state traceability sections.
+  - Deliverables:
+    - Updated/published files under `backend/openapi/` and/or `backend/python-api/README.md` contract section.
+    - WebSocket catalog document under `docs/` or `specs/features/`.
+  - Done criteria:
+    - Published contract artifacts match tested behavior from tasks 15 to 17.
+    - Consumers can integrate without reading implementation source code.
   - Requirement: FR-backend-03, FR-backend-04, NFR-03
 
-- [ ] 20. Update traceability and current-state
-  - Map implemented modules and tests to all backend requirements.
-  - Update `specs/current-state.md` with coverage and execution status.
+- [x] 20. Update traceability and current-state
+  - Scope: finalize milestone closure with full requirement-to-code-to-test evidence.
+  - Update feature traceability with explicit mapping for FR-backend-01 through FR-backend-12 and NFR-01 through NFR-03.
+  - Add Milestone D validation evidence block (lint, typing, full test suite, and contract/realtime suites if split commands are used).
+  - Reconcile implementation plan task checklist statuses and milestone completion notes.
+  - Add concise post-mortem notes:
+    - What changed in architecture confidence.
+    - Remaining known gaps intentionally deferred.
+  - Deliverables:
+    - `specs/current-state.md` updated with Milestone D completion and traceability rollup.
+    - `specs/features/007-backend-core-tasks.md` task statuses synced with execution reality.
+  - Done criteria:
+    - No requirement remains without code/test traceability reference.
+    - Current-state snapshot is sufficient for next feature planning without ambiguity.
   - Requirement: FR-backend-01 through FR-backend-12, NFR-01 through NFR-03
 
 ## Milestone Checks
@@ -300,3 +379,42 @@
 - Risks considered: auth/share-link brute-force abuse, oversized payload abuse, and insecure default API response headers.
 - Controls applied: endpoint-scoped rate limiting, max request-size guard, strict content-type checks for mutating payloads, baseline defensive security headers, and environment-aware CORS defaults.
 - Residual risks: in-memory rate limiting is process-local for MVP and should be replaced by distributed throttling for multi-instance deployments.
+
+## Milestone D Progress Notes (2026-03-21)
+- Task 15 executed (contract suite expansion):
+  - Added auth contract coverage for login success and deterministic invalid-credentials error contract.
+  - Added websocket envelope contract checks for required fields and schema shape under fan-out scenarios.
+  - Verified stable error envelope keys (`code`, `message`, `details`, `trace_id`) on authentication failures.
+
+- Task 16 executed (integration suite completion):
+  - Consolidated integration coverage across core/lists/sharing/profile modules with negative-path checks.
+  - Preserved deterministic idempotency, share-link lifecycle, and reset/restore contract validations.
+  - Confirmed integration suite remains deterministic in local CI mode.
+
+- Task 17 executed (realtime integrations):
+  - Added multi-client websocket fan-out integration test validating identical envelope delivery.
+  - Added ordered sequential event assertions for monotonic delivery semantics.
+  - Added membership transition scenario (non-member rejected, then accepted after role update).
+
+- Task 18 executed (security evidence):
+  - Added endpoint-level security checklist artifact with pass/partial findings and residual risk register.
+  - Captured dependency hygiene evidence with `uv pip check`.
+
+- Task 19 executed (contract publication):
+  - Published FastAPI OpenAPI snapshot to `backend/openapi/python-api.openapi.json`.
+  - Published websocket event catalog to `backend/openapi/python-api-ws-events.md`.
+  - Linked published artifacts in `backend/python-api/README.md`.
+
+- Task 20 executed (traceability/state sync):
+  - Updated `specs/current-state.md` with Milestone D execution status, traceability mapping, and validation evidence.
+
+- Validation evidence:
+  - `.venv/Scripts/python.exe -m ruff check .` -> pass
+  - `.venv/Scripts/python.exe -m mypy app tests` -> pass
+  - `.venv/Scripts/python.exe -m pytest -q` -> pass (57 passed, 3 warnings)
+  - `uv pip check` -> pass (dependency metadata consistency check)
+
+### Security notes - Block 15-20 (Milestone D closure)
+- Risks considered: undocumented contract drift, incomplete realtime confidence, and missing release security evidence.
+- Controls applied: contract test expansion, websocket integration fan-out/order validation, published OpenAPI+WS artifacts, and endpoint-level security checklist with residual risk register.
+- Residual risks: distributed rate limiting and cross-process websocket fan-out remain out of MVP single-instance scope.

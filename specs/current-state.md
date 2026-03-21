@@ -54,7 +54,16 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - No frontend migration execution yet from existing UI components to Tamagui.
 - UI screen-map, technical design, and implementation task breakdown are defined for feature 006.
 - No explicit performance/load validation runs yet for NFR targets.
-- Feature 007 tasks 15-20 remain pending (contract/realtime integration suites, security evidence rollup, docs, and final traceability sweep).
+- Feature 007 Milestone D is complete (tasks 15-20 executed: contract/realtime integration suites, security evidence rollup, contract publication, and final traceability sweep).
+
+## Milestone D Execution Status (Feature 007)
+- Completed scope:
+	- Contract suite expansion for auth and websocket envelope validation.
+	- Realtime integration coverage for fan-out, ordering, and membership transition behavior.
+	- Endpoint-level security checklist and residual risk register.
+	- Published OpenAPI snapshot and WebSocket event catalog.
+	- Full traceability/state synchronization.
+- Impact scope executed: backend (`backend/python-api`, `backend/openapi`, `docs/`, and specs traceability updates).
 
 ## Traceability Update (Feature 007 Milestone A-B)
 - FR-backend-11, NFR-01, NFR-03
@@ -101,6 +110,18 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- Code: `backend/python-api/app/core/request_context.py`, `backend/python-api/app/modules/auth/context.py`, `backend/python-api/app/api/rest/v1/endpoints/lists.py`, `backend/python-api/app/api/rest/v1/endpoints/sharing.py`, `backend/python-api/app/api/rest/v1/endpoints/profile.py`, `backend/python-api/app/modules/lists/service.py`, `backend/python-api/app/modules/sharing/service.py`, `backend/python-api/app/modules/notifications/service.py`
 	- Tests: `backend/python-api/tests/unit/lists/test_realtime_emission.py`, `backend/python-api/tests/unit/lists/test_reset_restore_service.py`, `backend/python-api/tests/unit/sharing/test_service.py`, `backend/python-api/tests/integration/core/test_profile_contract.py`, `backend/python-api/tests/integration/lists/test_contract.py`, `backend/python-api/tests/integration/sharing/test_sharing_contract.py`
 
+## Traceability Update (Feature 007 Milestone D)
+- FR-backend-03, FR-backend-10, FR-backend-12 (Task 15)
+	- Tests: `backend/python-api/tests/integration/core/test_auth_contract.py`, `backend/python-api/tests/integration/core/test_error_contract.py`
+- FR-backend-04, FR-backend-12 (Task 15, Task 17)
+	- Tests: `backend/python-api/tests/integration/core/test_ws_contract.py`, `backend/python-api/tests/integration/core/test_ws_realtime_integration.py`
+- FR-backend-05, FR-backend-06, FR-backend-07, FR-backend-09, FR-backend-12 (Task 16)
+	- Tests: `backend/python-api/tests/integration/lists/test_contract.py`, `backend/python-api/tests/integration/lists/test_idempotency_contract.py`, `backend/python-api/tests/integration/lists/test_reset_restore_contract.py`, `backend/python-api/tests/integration/sharing/test_sharing_contract.py`, `backend/python-api/tests/integration/core/test_profile_contract.py`
+- FR-backend-10, NFR-02 (Task 18)
+	- Evidence: `docs/backend_milestone_d_security_checklist.md`, `backend/python-api/tests/integration/core/test_security_hardening.py`
+- FR-backend-03, FR-backend-04, NFR-03 (Task 19)
+	- Contracts: `backend/openapi/python-api.openapi.json`, `backend/openapi/python-api-ws-events.md`, `backend/python-api/README.md`
+
 ## Validation Evidence (Task 8-10)
 - `uv run ruff check .` -> pass
 - `uv run mypy app tests` -> pass
@@ -115,6 +136,24 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - `.venv/Scripts/python.exe -m ruff check .` -> pass
 - `.venv/Scripts/python.exe -m mypy app tests` -> pass
 - `.venv/Scripts/python.exe -m pytest -q` -> pass (52 passed, 3 warnings)
+
+## Validation Evidence (Milestone D: Task 15-20)
+- `.venv/Scripts/python.exe -m ruff check .` -> pass
+- `.venv/Scripts/python.exe -m mypy app tests` -> pass
+- `.venv/Scripts/python.exe -m pytest -q` -> pass (57 passed, 3 warnings)
+- `uv pip check` -> pass
+
+## Session Continuity Notes (2026-03-21)
+- Local runtime stability hardening completed for backend make/scripts:
+	- root `/.env` established as runtime source of truth for backend script actions.
+	- migration and seed flows aligned with the same env-loading path.
+- Local bootstrap for manual API testing added:
+	- dummy-user seeding command available via `make py-backend-seed-dummy-user`.
+	- demo credential email uses validator-safe domain (`demo@shoppinglist.dev`).
+- Postman reliability improvements added:
+	- native collection file added at `backend/openapi/python-api.postman_collection.json` with login token capture and protected-request auth propagation.
+- Verification policy refinement:
+	- automated tests remain required, but backend/API completion also requires quick manual smoke checks (run app, login, and one protected endpoint).
 
 ## Security Notes (Task 8)
 - Risks considered: duplicate replayed mutations, ambiguous idempotency key reuse with altered payloads, and replay-store growth.
@@ -131,6 +170,11 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - Controls applied: transactional pre-reset snapshot creation before reset mutation, restore constrained to latest pre-reset snapshot, membership checks on reset/restore endpoints, and deterministic error response when no snapshot exists.
 - Residual risks: snapshot pruning/retention automation is pending future hardening work.
 
+## Security Notes (Milestone D)
+- Risks considered: contract drift between implementation and published docs, insufficient realtime confidence under collaboration flows, and incomplete deployment security evidence.
+- Controls applied: expanded contract/realtime integration suites, OpenAPI and WebSocket contract publication from runtime state, endpoint-level security checklist evidence, and dependency consistency check.
+- Residual risks: distributed throttling and cross-process websocket fan-out remain pending beyond MVP single-instance constraints.
+
 ## Next Actions
 1. Create implementation plan per feature with impact labels:
 	- `001-auth`: full-stack
@@ -138,7 +182,7 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- `003-shared-realtime-list`: full-stack
 	- `004-template-and-reset`: full-stack
 	- `005-platform-and-stack`: backend + frontend + devops
-2. Start Milestone D for feature 007 (tasks 15-20): contract/realtime integration suites, security evidence rollup, and backend contract publication.
+2. Begin implementation execution for feature `001-auth` with backend/frontend traceability updates.
 3. Define Tamagui design tokens and base component layer for React Native screens.
 4. Begin phase-4 execution for `006-ui-screen-map` following `006-ui-screen-map-tasks.md`.
 5. Implement auth and list domains first (`001`, `002`) to unlock MVP usage.

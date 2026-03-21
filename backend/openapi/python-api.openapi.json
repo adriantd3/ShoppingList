@@ -1,0 +1,2005 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ShoppingList Python API",
+    "version": "0.1.0",
+    "x-postman-notes": "On POST /api/v1/auth/login, save access_token to collection variable jwt_token. Protected endpoints use BearerAuth with {{jwt_token}}."
+  },
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health",
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Api V1 Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login",
+        "operationId": "login_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-tests": [
+          "const data = pm.response.json();",
+          "if (data && data.access_token) {",
+          "  pm.collectionVariables.set('jwt_token', data.access_token);",
+          "  pm.test('JWT token saved to collection variable', function () {",
+          "    pm.expect(pm.collectionVariables.get('jwt_token')).to.be.a('string').and.not.empty;",
+          "  });",
+          "} else {",
+          "  pm.test('Login response includes access_token', function () {",
+          "    pm.expect.fail('Response does not include access_token');",
+          "  });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/lists": {
+      "get": {
+        "tags": [
+          "lists"
+        ],
+        "summary": "Get Lists",
+        "operationId": "get_lists_api_v1_lists_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ListResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Get Lists Api V1 Lists Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      },
+      "post": {
+        "tags": [
+          "lists"
+        ],
+        "summary": "Create List",
+        "operationId": "create_list_api_v1_lists_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/lists/{list_id}": {
+      "get": {
+        "tags": [
+          "lists"
+        ],
+        "summary": "Get List",
+        "operationId": "get_list_api_v1_lists__list_id__get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      },
+      "patch": {
+        "tags": [
+          "lists"
+        ],
+        "summary": "Patch List",
+        "operationId": "patch_list_api_v1_lists__list_id__patch",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      },
+      "delete": {
+        "tags": [
+          "lists"
+        ],
+        "summary": "Remove List",
+        "operationId": "remove_list_api_v1_lists__list_id__delete",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/lists/{list_id}/items": {
+      "get": {
+        "tags": [
+          "lists"
+        ],
+        "summary": "Get List Items",
+        "operationId": "get_list_items_api_v1_lists__list_id__items_get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListItemResponse"
+                  },
+                  "title": "Response Get List Items Api V1 Lists  List Id  Items Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      },
+      "post": {
+        "tags": [
+          "lists"
+        ],
+        "summary": "Create List Item",
+        "operationId": "create_list_item_api_v1_lists__list_id__items_post",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListItemCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListItemResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/lists/{list_id}/items/{item_id}": {
+      "patch": {
+        "tags": [
+          "lists"
+        ],
+        "summary": "Patch List Item",
+        "operationId": "patch_list_item_api_v1_lists__list_id__items__item_id__patch",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          },
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListItemUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListItemResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      },
+      "delete": {
+        "tags": [
+          "lists"
+        ],
+        "summary": "Remove List Item",
+        "operationId": "remove_list_item_api_v1_lists__list_id__items__item_id__delete",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          },
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/lists/{list_id}/reset": {
+      "post": {
+        "tags": [
+          "lists"
+        ],
+        "summary": "Reset List",
+        "operationId": "reset_list_api_v1_lists__list_id__reset_post",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResetResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/lists/{list_id}/restore-latest": {
+      "post": {
+        "tags": [
+          "lists"
+        ],
+        "summary": "Restore Latest",
+        "operationId": "restore_latest_api_v1_lists__list_id__restore_latest_post",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListRestoreLatestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/lists/{list_id}/share-links": {
+      "post": {
+        "tags": [
+          "sharing"
+        ],
+        "summary": "Issue Share Link",
+        "operationId": "issue_share_link_api_v1_lists__list_id__share_links_post",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShareLinkIssueRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShareLinkIssueResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/lists/{list_id}/share-links/{share_link_id}/revoke": {
+      "post": {
+        "tags": [
+          "sharing"
+        ],
+        "summary": "Revoke Share Link",
+        "operationId": "revoke_share_link_api_v1_lists__list_id__share_links__share_link_id__revoke_post",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          },
+          {
+            "name": "share_link_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Share Link Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShareLinkResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/lists/{list_id}/share-links/{share_link_id}/expire": {
+      "post": {
+        "tags": [
+          "sharing"
+        ],
+        "summary": "Expire Share Link",
+        "operationId": "expire_share_link_api_v1_lists__list_id__share_links__share_link_id__expire_post",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          },
+          {
+            "name": "share_link_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Share Link Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShareLinkResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/share-links/consume": {
+      "post": {
+        "tags": [
+          "sharing"
+        ],
+        "summary": "Consume Share Link",
+        "operationId": "consume_share_link_api_v1_share_links_consume_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShareLinkConsumeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShareLinkConsumeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/profile": {
+      "get": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Get Profile",
+        "operationId": "get_profile_api_v1_profile_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      },
+      "patch": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Patch Profile",
+        "operationId": "patch_profile_api_v1_profile_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/profile/notifications": {
+      "get": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Get Notification Preferences",
+        "operationId": "get_notification_preferences_api_v1_profile_notifications_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferencesResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      },
+      "patch": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Patch Notification Preferences",
+        "operationId": "patch_notification_preferences_api_v1_profile_notifications_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationPreferencesUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferencesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/profile/push-tokens": {
+      "post": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Register Push Token",
+        "operationId": "register_push_token_api_v1_profile_push_tokens_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DevicePushTokenRegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DevicePushTokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/lists/{list_id}/member-check": {
+      "get": {
+        "tags": [
+          "security"
+        ],
+        "summary": "Member Check",
+        "operationId": "member_check_api_v1_lists__list_id__member_check_get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Member Check Api V1 Lists  List Id  Member Check Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    },
+    "/api/v1/lists/{list_id}/owner-check": {
+      "get": {
+        "tags": [
+          "security"
+        ],
+        "summary": "Owner Check",
+        "operationId": "owner_check_api_v1_lists__list_id__owner_check_get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "List Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Owner Check Api V1 Lists  List Id  Owner Check Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-postman-prerequest": [
+          "const jwt = pm.collectionVariables.get('jwt_token');",
+          "if (jwt) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${jwt}` });",
+          "}"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DevicePushTokenRegisterRequest": {
+        "properties": {
+          "platform": {
+            "type": "string",
+            "enum": [
+              "ios",
+              "android"
+            ],
+            "title": "Platform"
+          },
+          "push_token": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 20,
+            "title": "Push Token"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "platform",
+          "push_token"
+        ],
+        "title": "DevicePushTokenRegisterRequest"
+      },
+      "DevicePushTokenResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "platform": {
+            "type": "string",
+            "title": "Platform"
+          },
+          "push_token": {
+            "type": "string",
+            "title": "Push Token"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "platform",
+          "push_token",
+          "last_seen_at",
+          "created_at"
+        ],
+        "title": "DevicePushTokenResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ListCreateRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "ListCreateRequest"
+      },
+      "ListItemCreateRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              }
+            ],
+            "title": "Quantity"
+          },
+          "unit": {
+            "type": "string",
+            "maxLength": 30,
+            "minLength": 1,
+            "title": "Unit"
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Category"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "is_purchased": {
+            "type": "boolean",
+            "title": "Is Purchased",
+            "default": false
+          },
+          "sort_index": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sort Index"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "quantity",
+          "unit",
+          "category"
+        ],
+        "title": "ListItemCreateRequest"
+      },
+      "ListItemResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "list_id": {
+            "type": "string",
+            "title": "List Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Quantity"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "is_purchased": {
+            "type": "boolean",
+            "title": "Is Purchased"
+          },
+          "is_template_item": {
+            "type": "boolean",
+            "title": "Is Template Item"
+          },
+          "sort_index": {
+            "type": "integer",
+            "title": "Sort Index"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "updated_by_user_id": {
+            "type": "string",
+            "title": "Updated By User Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "list_id",
+          "name",
+          "quantity",
+          "unit",
+          "category",
+          "note",
+          "is_purchased",
+          "is_template_item",
+          "sort_index",
+          "updated_at",
+          "updated_by_user_id"
+        ],
+        "title": "ListItemResponse"
+      },
+      "ListItemUpdateRequest": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantity"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "is_purchased": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Purchased"
+          },
+          "sort_index": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sort Index"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ListItemUpdateRequest"
+      },
+      "ListResetResponse": {
+        "properties": {
+          "list_id": {
+            "type": "string",
+            "title": "List Id"
+          },
+          "snapshot_id": {
+            "type": "string",
+            "title": "Snapshot Id"
+          },
+          "reset_items_count": {
+            "type": "integer",
+            "title": "Reset Items Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "list_id",
+          "snapshot_id",
+          "reset_items_count"
+        ],
+        "title": "ListResetResponse"
+      },
+      "ListResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "owner_user_id": {
+            "type": "string",
+            "title": "Owner User Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "status",
+          "owner_user_id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ListResponse"
+      },
+      "ListRestoreLatestResponse": {
+        "properties": {
+          "list_id": {
+            "type": "string",
+            "title": "List Id"
+          },
+          "snapshot_id": {
+            "type": "string",
+            "title": "Snapshot Id"
+          },
+          "restored_items_count": {
+            "type": "integer",
+            "title": "Restored Items Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "list_id",
+          "snapshot_id",
+          "restored_items_count"
+        ],
+        "title": "ListRestoreLatestResponse"
+      },
+      "ListUpdateRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "ListUpdateRequest"
+      },
+      "LoginRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 8,
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "LoginRequest"
+      },
+      "NotificationPreferencesResponse": {
+        "properties": {
+          "list_change_push_enabled": {
+            "type": "boolean",
+            "title": "List Change Push Enabled"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "list_change_push_enabled",
+          "updated_at"
+        ],
+        "title": "NotificationPreferencesResponse"
+      },
+      "NotificationPreferencesUpdateRequest": {
+        "properties": {
+          "list_change_push_enabled": {
+            "type": "boolean",
+            "title": "List Change Push Enabled"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "list_change_push_enabled"
+        ],
+        "title": "NotificationPreferencesUpdateRequest"
+      },
+      "ProfileResponse": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "email",
+          "display_name",
+          "is_active"
+        ],
+        "title": "ProfileResponse"
+      },
+      "ProfileUpdateRequest": {
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Display Name"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "display_name"
+        ],
+        "title": "ProfileUpdateRequest"
+      },
+      "ShareLinkConsumeRequest": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 20,
+            "title": "Token"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "ShareLinkConsumeRequest"
+      },
+      "ShareLinkConsumeResponse": {
+        "properties": {
+          "list_id": {
+            "type": "string",
+            "title": "List Id"
+          },
+          "membership_role": {
+            "type": "string",
+            "title": "Membership Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "list_id",
+          "membership_role"
+        ],
+        "title": "ShareLinkConsumeResponse"
+      },
+      "ShareLinkIssueRequest": {
+        "properties": {
+          "expires_in_minutes": {
+            "type": "integer",
+            "maximum": 10080.0,
+            "minimum": 5.0,
+            "title": "Expires In Minutes",
+            "default": 1440
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ShareLinkIssueRequest"
+      },
+      "ShareLinkIssueResponse": {
+        "properties": {
+          "link": {
+            "$ref": "#/components/schemas/ShareLinkResponse"
+          },
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "link",
+          "token"
+        ],
+        "title": "ShareLinkIssueResponse"
+      },
+      "ShareLinkResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "list_id": {
+            "type": "string",
+            "title": "List Id"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked At"
+          },
+          "revoked_by_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked By User Id"
+          },
+          "created_by_user_id": {
+            "type": "string",
+            "title": "Created By User Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "list_id",
+          "expires_at",
+          "revoked_at",
+          "revoked_by_user_id",
+          "created_by_user_id",
+          "created_at"
+        ],
+        "title": "ShareLinkResponse"
+      },
+      "TokenResponse": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type",
+            "default": "bearer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token"
+        ],
+        "title": "TokenResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "OAuth2PasswordBearer": {
+        "type": "oauth2",
+        "flows": {
+          "password": {
+            "scopes": {},
+            "tokenUrl": "/api/v1/auth/login"
+          }
+        }
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Use JWT from login response. In Postman set token as {{jwt_token}}."
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000",
+      "description": "Local development"
+    }
+  ],
+  "x-postman-variables": {
+    "jwt_token": ""
+  }
+}

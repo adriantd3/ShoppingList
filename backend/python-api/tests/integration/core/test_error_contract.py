@@ -18,3 +18,12 @@ def test_forbidden_error_contract(client: TestClient) -> None:
     payload = response.json()
     assert payload["error"]["code"] == "AUTH_TOKEN_INVALID"
     assert "trace_id" in payload["error"]
+
+
+def test_lists_requires_bearer_token(client: TestClient) -> None:
+    response = client.get("/api/v1/lists")
+
+    assert response.status_code == 401
+    payload = response.json()
+    assert payload["error"]["code"] == "AUTH_TOKEN_INVALID"
+    assert payload["error"]["message"] == "Missing bearer token"

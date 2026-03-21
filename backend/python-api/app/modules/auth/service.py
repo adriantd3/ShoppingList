@@ -1,4 +1,5 @@
 from sqlalchemy import Select, select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import ApiError, ErrorCode
@@ -14,7 +15,14 @@ async def authenticate_user(db: AsyncSession, payload: LoginRequest) -> UserPrin
         .where(User.email == payload.email)
         .where(AuthIdentity.provider == "password")
     )
-    result = await db.execute(stmt)
+    try:
+        result = await db.execute(stmt)
+    except SQLAlchemyError as exc:
+        raise ApiError(
+            code=ErrorCode.INTERNAL_ERROR,
+            message="Authentication service temporarily unavailable",
+            status_code=503,
+        ) from exc
     row = result.first()
 
     if not row:

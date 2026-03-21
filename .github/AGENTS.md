@@ -41,6 +41,7 @@ Before proposing changes, the agent should identify whether the feature impacts 
 - Compare behavior before/after changes when relevant.
 - Ask: "Would a staff engineer approve this?"
 - Run tests, check logs, and demonstrate correctness.
+- For backend/API changes, also run quick manual smoke checks (app running, login flow, and at least one protected endpoint) instead of relying only on automated tests.
 
 ### 5. Demand Elegance (Balanced)
 - For non-trivial changes, ask if there is a more elegant solution.
@@ -65,6 +66,11 @@ Before proposing changes, the agent should identify whether the feature impacts 
 ## Core Principles
 - Simplicity first: change the minimum code required to satisfy requirements.
 - No laziness: find root causes; avoid temporary fixes.
+
+## Session Lessons to Reuse
+- Postman OpenAPI imports can ignore custom `x-postman-*` extensions; prefer a native Postman collection for reliable token scripts.
+- Keep a single runtime env source of truth for backend (`/.env`) to avoid credential drift and hidden overrides.
+- Seed/demo credentials must use validator-compatible email domains (avoid reserved/special-use domains such as `.local`).
 
 ## Backend Test Layout Convention
 - For `backend/python-api`, keep all tests under `backend/python-api/tests` (never under `backend/python-api/app/tests`).
