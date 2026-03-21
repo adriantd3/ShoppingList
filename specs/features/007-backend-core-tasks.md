@@ -55,7 +55,7 @@
   - Return deterministic responses for duplicate and conflicting replays.
   - Requirement: FR-backend-06
 
-- [ ] 9. Implement sharing lifecycle contracts
+- [x] 9. Implement sharing lifecycle contracts
   - Add share-link issue, consume, expire, revoke endpoints.
   - Store link tokens as hashes only.
   - Add audit metadata for creator, timestamps, and revoke actor.
@@ -209,6 +209,17 @@
     - `uv run mypy app tests` -> pass
     - `uv run pytest` -> pass (21 passed, 3 warnings)
 
+- Task 9 executed (sharing lifecycle contracts):
+  - Added share-link issue, consume, revoke, and expire endpoints.
+  - Implemented share-link service/repository flow with membership checks and lifecycle validation.
+  - Persisted share-link audit metadata for revocation actor and timestamps.
+  - Enforced token-hash-only persistence and deterministic error responses for revoked/expired links.
+  - Added unit and integration tests for sharing contracts and token hashing behavior.
+  - Validation evidence:
+    - `uv run ruff check .` -> pass
+    - `uv run mypy app tests` -> pass
+    - `uv run pytest` -> pass (28 passed, 3 warnings)
+
 ### Security notes - Block 7 (Task 7: lists/items contracts)
 - Risks considered: broken access control, malformed input leading to inconsistent state, error response leakage.
 - Controls applied: authenticated route dependencies, strict schema validation with forbidden unknown fields, deterministic item ordering, safe validation error serialization.
@@ -218,3 +229,8 @@
 - Risks considered: duplicate offline replays causing repeated mutations, key reuse ambiguity across payloads, and unbounded replay storage growth.
 - Controls applied: request-scoped idempotency key handling on mutating list/item endpoints, SHA-256 payload fingerprinting, deterministic conflict response (`409` + stable error code), persistent response replay with configurable TTL.
 - Residual risks: concurrent first-write races can still execute duplicate side effects under high contention and will require additional locking/rate controls in future hardening milestones.
+
+### Security notes - Block 9 (Task 9: sharing lifecycle)
+- Risks considered: unauthorized list joining through leaked links, replay of revoked links, and accidental plaintext token persistence.
+- Controls applied: authenticated consume flow, membership checks for issue/revoke/expire operations, token hashing before persistence, explicit revoked/expired conflict handling with stable error codes, and revoke-actor audit metadata.
+- Residual risks: no rate-limiting yet on share-link operations; abuse controls remain in Milestone C hardening.

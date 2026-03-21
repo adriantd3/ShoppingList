@@ -54,7 +54,7 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - No frontend migration execution yet from existing UI components to Tamagui.
 - UI screen-map, technical design, and implementation task breakdown are defined for feature 006.
 - No explicit performance/load validation runs yet for NFR targets.
-- Feature 007 tasks 9-20 remain pending (sharing lifecycle, reset/restore, realtime, hardening, full contract/integration/realtime suites).
+- Feature 007 tasks 10-20 remain pending (reset/restore, realtime, hardening, full contract/integration/realtime suites).
 
 ## Traceability Update (Feature 007 Milestone A-B)
 - FR-backend-11, NFR-01, NFR-03
@@ -75,16 +75,24 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - FR-backend-06 (Milestone B - Task 8)
 	- Code: `backend/python-api/app/core/idempotency.py`, `backend/python-api/app/api/rest/v1/endpoints/lists.py`, `backend/python-api/app/db/models.py`, `backend/python-api/app/core/config.py`, `backend/python-api/migrations/versions/20260321_0002_task8_idempotency_records.py`
 	- Tests: `backend/python-api/tests/unit/core/test_idempotency.py`, `backend/python-api/tests/integration/lists/test_idempotency_contract.py`
+- FR-backend-03, FR-backend-09 (Milestone B - Task 9)
+	- Code: `backend/python-api/app/api/rest/v1/endpoints/sharing.py`, `backend/python-api/app/modules/sharing/schemas.py`, `backend/python-api/app/modules/sharing/repository.py`, `backend/python-api/app/modules/sharing/service.py`, `backend/python-api/app/db/models.py`, `backend/python-api/migrations/versions/20260321_0003_task9_share_links_audit.py`, `backend/python-api/app/api/rest/v1/router.py`
+	- Tests: `backend/python-api/tests/integration/sharing/test_sharing_contract.py`, `backend/python-api/tests/unit/sharing/test_service.py`
 
-## Validation Evidence (Task 8)
+## Validation Evidence (Task 8-9)
 - `uv run ruff check .` -> pass
 - `uv run mypy app tests` -> pass
-- `uv run pytest` -> pass (21 passed, 3 warnings)
+- `uv run pytest` -> pass (28 passed, 3 warnings)
 
 ## Security Notes (Task 8)
 - Risks considered: duplicate replayed mutations, ambiguous idempotency key reuse with altered payloads, and replay-store growth.
 - Controls applied: optional `Idempotency-Key` handling on mutating list/item endpoints, request fingerprinting with deterministic scope, persistent response replay with configurable TTL, and stable 409 conflict contract using `IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD`.
 - Residual risks: concurrent first-write races can still execute duplicate side effects under high contention before persistence conflict resolution.
+
+## Security Notes (Task 9)
+- Risks considered: unauthorized share-link consumption, token leakage in persistence, and revoked/expired link reuse.
+- Controls applied: token hash-only persistence, authenticated consume path with deterministic revoked/expired conflict responses, membership checks on issue/revoke/expire operations, and revocation actor audit metadata.
+- Residual risks: share-link abuse controls and rate limiting remain pending Milestone C hardening.
 
 ## Next Actions
 1. Create implementation plan per feature with impact labels:
@@ -93,7 +101,7 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- `003-shared-realtime-list`: full-stack
 	- `004-template-and-reset`: full-stack
 	- `005-platform-and-stack`: backend + frontend + devops
-2. Continue Milestone B for feature 007 (tasks 9-10): sharing lifecycle, reset/restore semantics.
+2. Continue Milestone B for feature 007 (task 10): reset/restore semantics.
 3. Define Tamagui design tokens and base component layer for React Native screens.
 4. Begin phase-4 execution for `006-ui-screen-map` following `006-ui-screen-map-tasks.md`.
 5. Implement auth and list domains first (`001`, `002`) to unlock MVP usage.
