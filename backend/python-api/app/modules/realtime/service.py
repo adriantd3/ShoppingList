@@ -22,27 +22,29 @@ async def emit_list_event(
     payload: dict,
     idempotency_key: str | None = None,
 ) -> RealtimeEventEnvelope:
-    event = await create_realtime_event(
-        db,
-        list_id=list_id,
-        event_type=event_type,
-        payload=payload,
-        idempotency_key=idempotency_key,
-    )
-    envelope = RealtimeEventEnvelope(
-        event_id=event.id,
-        event_type=event.event_type,
-        list_id=event.list_id,
-        occurred_at=event.created_at,
-        actor_user_id=actor_user_id,
-        payload=event.payload,
-        version=1,
-    )
+    async with db.begin():
+        event = await create_realtime_event(
+            db,
+            list_id=list_id,
+            event_type=event_type,
+            payload=payload,
+            idempotency_key=idempotency_key,
+        )
 
-    await publish_notify(
-        db,
-        channel=LIST_EVENTS_CHANNEL,
-        payload=_to_notify_payload(envelope),
-    )
+        envelope = RealtimeEventEnvelope(
+            event_id=event.id,
+            event_type=event.event_type,
+            list_id=event.list_id,
+            occurred_at=event.created_at,
+            actor_user_id=actor_user_id,
+            payload=event.payload,
+            version=1,
+        )
+
+        await publish_notify(
+            db,
+            channel=LIST_EVENTS_CHANNEL,
+            payload=_to_notify_payload(envelope),
+        )
     await connection_manager.broadcast_event(list_id, json.loads(envelope.model_dump_json()))
     return envelope

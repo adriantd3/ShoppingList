@@ -1,5 +1,3 @@
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from decimal import Decimal
 from types import SimpleNamespace
@@ -8,8 +6,6 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from app.core.request_context import clear_request_context, set_request_context
-from app.modules.auth.context import AuthenticatedContext
 from app.modules.auth.schemas import UserPrincipal
 from app.modules.lists import schemas, service
 
@@ -32,9 +28,13 @@ def _item_fixture(*, is_purchased: bool) -> SimpleNamespace:
 
 
 @pytest.mark.asyncio
-async def test_create_item_emits_created_event(monkeypatch: pytest.MonkeyPatch) -> None:
-    principal = UserPrincipal(user_id="user-1", email="user@example.com")
-    db = AsyncMock()
+async def test_create_item_emits_created_event(
+    monkeypatch: pytest.MonkeyPatch,
+    transactional_session: Any,
+    principal_user: UserPrincipal,
+) -> None:
+    principal = principal_user
+    db = transactional_session
 
     monkeypatch.setattr(service.repository, "get_list_for_member", AsyncMock(return_value=SimpleNamespace(id="list-1")))
     created_item = _item_fixture(is_purchased=False)
@@ -51,12 +51,7 @@ async def test_create_item_emits_created_event(monkeypatch: pytest.MonkeyPatch) 
         note=None,
         is_purchased=False,
     )
-    context = AuthenticatedContext(db=db, principal=principal)
-    token = set_request_context(context)
-    try:
-        await service.create_item_for_user("list-1", payload)
-    finally:
-        clear_request_context(token)
+    await service.create_item_for_user(db=cast(Any, db), principal=principal, list_id="list-1", payload=payload)
 
     assert emit_mock.await_count == 1
     assert emit_mock.await_args is not None
@@ -73,12 +68,14 @@ async def test_create_item_emits_created_event(monkeypatch: pytest.MonkeyPatch) 
 )
 async def test_update_item_emits_expected_event(
     monkeypatch: pytest.MonkeyPatch,
+    transactional_session: Any,
+    principal_user: UserPrincipal,
     old_state: bool,
     new_state: bool,
     expected_event: str,
 ) -> None:
-    principal = UserPrincipal(user_id="user-1", email="user@example.com")
-    db = AsyncMock()
+    principal = principal_user
+    db = transactional_session
 
     monkeypatch.setattr(service.repository, "get_list_for_member", AsyncMock(return_value=SimpleNamespace(id="list-1")))
     monkeypatch.setattr(
@@ -95,12 +92,13 @@ async def test_update_item_emits_expected_event(
     monkeypatch.setattr(service, "emit_list_event", emit_mock)
 
     payload = schemas.ListItemUpdateRequest(is_purchased=new_state)
-    context = AuthenticatedContext(db=db, principal=principal)
-    token = set_request_context(context)
-    try:
-        await service.update_item_for_user("list-1", "item-1", payload)
-    finally:
-        clear_request_context(token)
+    await service.update_item_for_user(
+        db=cast(Any, db),
+        principal=principal,
+        list_id="list-1",
+        item_id="item-1",
+        payload=payload,
+    )
 
     assert emit_mock.await_count == 1
     assert emit_mock.await_args is not None
@@ -108,9 +106,13 @@ async def test_update_item_emits_expected_event(
 
 
 @pytest.mark.asyncio
-async def test_delete_item_emits_deleted_event(monkeypatch: pytest.MonkeyPatch) -> None:
-    principal = UserPrincipal(user_id="user-1", email="user@example.com")
-    db = AsyncMock()
+async def test_delete_item_emits_deleted_event(
+    monkeypatch: pytest.MonkeyPatch,
+    transactional_session: Any,
+    principal_user: UserPrincipal,
+) -> None:
+    principal = principal_user
+    db = transactional_session
 
     monkeypatch.setattr(service.repository, "get_list_for_member", AsyncMock(return_value=SimpleNamespace(id="list-1")))
     monkeypatch.setattr(service.repository, "get_item_for_list", AsyncMock(return_value=_item_fixture(is_purchased=False)))
@@ -118,12 +120,7 @@ async def test_delete_item_emits_deleted_event(monkeypatch: pytest.MonkeyPatch) 
     emit_mock = AsyncMock()
     monkeypatch.setattr(service, "emit_list_event", emit_mock)
 
-    context = AuthenticatedContext(db=db, principal=principal)
-    token = set_request_context(context)
-    try:
-        await service.delete_item_for_user("list-1", "item-1")
-    finally:
-        clear_request_context(token)
+    await service.delete_item_for_user(db=cast(Any, db), principal=principal, list_id="list-1", item_id="item-1")
 
     assert emit_mock.await_count == 1
     assert emit_mock.await_args is not None
@@ -131,15 +128,13 @@ async def test_delete_item_emits_deleted_event(monkeypatch: pytest.MonkeyPatch) 
 
 
 @pytest.mark.asyncio
-async def test_reset_and_restore_emit_events(monkeypatch: pytest.MonkeyPatch) -> None:
-    principal = UserPrincipal(user_id="user-1", email="user@example.com")
-
-    class DummySession:
-        @asynccontextmanager
-        async def begin(self) -> AsyncIterator[None]:
-            yield
-
-    db = DummySession()
+async def test_reset_and_restore_emit_events(
+    monkeypatch: pytest.MonkeyPatch,
+    transactional_session: Any,
+    principal_user: UserPrincipal,
+) -> None:
+    principal = principal_user
+    db = transactional_session
 
     monkeypatch.setattr(service.repository, "get_list_for_member", AsyncMock(return_value=SimpleNamespace(id="list-1")))
     monkeypatch.setattr(service.repository, "list_items", AsyncMock(return_value=[]))
@@ -155,13 +150,8 @@ async def test_reset_and_restore_emit_events(monkeypatch: pytest.MonkeyPatch) ->
     emit_mock = AsyncMock()
     monkeypatch.setattr(service, "emit_list_event", emit_mock)
 
-    context = AuthenticatedContext(db=cast(Any, db), principal=principal)
-    token = set_request_context(context)
-    try:
-        await service.reset_list_for_user("list-1")
-        await service.restore_latest_for_user("list-1")
-    finally:
-        clear_request_context(token)
+    await service.reset_list_for_user(db=cast(Any, db), principal=principal, list_id="list-1")
+    await service.restore_latest_for_user(db=cast(Any, db), principal=principal, list_id="list-1")
 
     emitted_types = [call.kwargs["event_type"] for call in emit_mock.await_args_list]
     assert emitted_types == ["list.reset.performed", "list.restore.performed"]

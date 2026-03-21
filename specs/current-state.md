@@ -18,6 +18,7 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- `005-platform-and-stack.md`
 	- `006-ui-screen-map.md`
 	- `007-backend-core.md`
+	- `008-backend-quality-overhaul.md`
 - Phase-2 technical design drafted for feature `006`:
 	- `006-ui-screen-map-design.md`
 - Phase-3 task breakdown drafted for feature `006`:
@@ -26,6 +27,10 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- `007-backend-core-design.md`
 - Phase-3 task breakdown drafted for feature `007`:
 	- `007-backend-core-tasks.md`
+- Phase-2 technical design drafted for feature `008`:
+	- `008-backend-quality-overhaul-design.md`
+- Phase-3 task breakdown drafted for feature `008`:
+	- `008-backend-quality-overhaul-tasks.md`
 - Confirmed MVP stack direction:
 	- Frontend: React Native + Expo
 	- UI Library: Tamagui (primary for new MVP screens)
@@ -122,6 +127,61 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - FR-backend-03, FR-backend-04, NFR-03 (Task 19)
 	- Contracts: `backend/openapi/python-api.openapi.json`, `backend/openapi/python-api-ws-events.md`, `backend/python-api/README.md`
 
+## Traceability Update (Feature 008 Slice 1)
+- FR-backend-quality-01, FR-backend-quality-02, NFR-quality-01
+	- Code: `backend/python-api/app/core/domain_errors.py`, `backend/python-api/app/core/errors.py`
+	- Tests: `backend/python-api/tests/integration/core/test_auth_contract.py`, `backend/python-api/tests/integration/core/test_error_contract.py`
+- FR-backend-quality-03
+	- Code: `backend/python-api/app/modules/auth/repository.py`, `backend/python-api/app/modules/auth/service.py`, `backend/python-api/app/modules/auth/dependencies.py`
+	- Tests: `backend/python-api/tests/unit/auth/test_auth_service.py`, `backend/python-api/tests/integration/core/test_auth_contract.py`
+- FR-backend-quality-06, NFR-quality-02
+	- Tests: `backend/python-api/tests/unit/auth/test_auth_service.py`, `backend/python-api/tests/integration/core/test_auth_contract.py`, `backend/python-api/tests/integration/core/test_error_contract.py`
+	- Specs: `specs/features/008-backend-quality-overhaul.md`, `specs/features/008-backend-quality-overhaul-design.md`, `specs/features/008-backend-quality-overhaul-tasks.md`
+
+## Traceability Update (Feature 008 Slice 2)
+- FR-backend-quality-04
+	- Code: `backend/python-api/app/modules/sharing/service.py`, `backend/python-api/app/api/rest/v1/endpoints/sharing.py`
+	- Tests: `backend/python-api/tests/unit/sharing/test_service.py`, `backend/python-api/tests/integration/sharing/test_sharing_contract.py`
+- FR-backend-quality-06, NFR-quality-02
+	- Tests: `backend/python-api/tests/unit/sharing/test_service.py`, `backend/python-api/tests/integration/sharing/test_sharing_contract.py`
+	- Specs: `specs/features/008-backend-quality-overhaul-tasks.md`
+
+## Traceability Update (Feature 008 Slice 3)
+- FR-backend-quality-04
+	- Code: `backend/python-api/app/modules/notifications/service.py`, `backend/python-api/app/api/rest/v1/endpoints/profile.py`
+	- Tests: `backend/python-api/tests/integration/core/test_profile_contract.py`
+- FR-backend-quality-06, NFR-quality-02
+	- Tests: `backend/python-api/tests/integration/core/test_profile_contract.py`
+	- Specs: `specs/features/008-backend-quality-overhaul-tasks.md`
+
+## Traceability Update (Feature 008 Slice 4)
+- FR-backend-quality-04
+	- Code: `backend/python-api/app/modules/lists/service.py`, `backend/python-api/app/api/rest/v1/endpoints/lists.py`
+	- Tests: `backend/python-api/tests/unit/lists/test_realtime_emission.py`, `backend/python-api/tests/unit/lists/test_reset_restore_service.py`, `backend/python-api/tests/integration/lists/test_contract.py`, `backend/python-api/tests/integration/lists/test_reset_restore_contract.py`
+- FR-backend-quality-06, NFR-quality-02
+	- Tests: `backend/python-api/tests/unit/lists/test_realtime_emission.py`, `backend/python-api/tests/unit/lists/test_reset_restore_service.py`, `backend/python-api/tests/integration/lists/test_contract.py`, `backend/python-api/tests/integration/lists/test_reset_restore_contract.py`
+	- Specs: `specs/features/008-backend-quality-overhaul-tasks.md`
+
+## Traceability Update (Feature 008 Slice 5)
+- FR-backend-quality-05
+	- Code: `backend/python-api/app/api/rest/v1/endpoints/lists.py`
+	- Tests: `backend/python-api/tests/integration/lists/test_contract.py`, `backend/python-api/tests/integration/lists/test_idempotency_contract.py`, `backend/python-api/tests/integration/lists/test_reset_restore_contract.py`
+- NFR-quality-02
+	- Specs: `specs/features/008-backend-quality-overhaul-tasks.md`
+
+## Traceability Update (Feature 008 Slice 6)
+- FR-backend-quality-05
+	- Code: `backend/python-api/app/modules/lists/repository.py`, `backend/python-api/app/modules/lists/service.py`, `backend/python-api/app/modules/sharing/repository.py`, `backend/python-api/app/modules/sharing/service.py`, `backend/python-api/app/modules/notifications/repository.py`, `backend/python-api/app/modules/notifications/service.py`, `backend/python-api/app/modules/realtime/repository.py`, `backend/python-api/app/modules/realtime/service.py`
+	- Tests: `backend/python-api/tests/unit/lists/test_realtime_emission.py`, `backend/python-api/tests/unit/sharing/test_service.py`, `backend/python-api/tests/unit/realtime/test_realtime_service.py`, `backend/python-api/tests/integration/lists/test_contract.py`, `backend/python-api/tests/integration/sharing/test_sharing_contract.py`, `backend/python-api/tests/integration/core/test_profile_contract.py`
+- FR-backend-quality-06, NFR-quality-02
+	- Tests: `backend/python-api/tests/unit/lists/test_realtime_emission.py`, `backend/python-api/tests/unit/sharing/test_service.py`, `backend/python-api/tests/unit/realtime/test_realtime_service.py`
+	- Specs: `specs/features/008-backend-quality-overhaul-tasks.md`
+
+## Traceability Update (Feature 008 Slice 7)
+- FR-backend-quality-06, NFR-quality-02
+	- Code/Tests: `backend/python-api/tests/conftest.py`, `backend/python-api/tests/unit/notifications/test_notifications_service.py`, `backend/python-api/tests/unit/lists/test_realtime_emission.py`, `backend/python-api/tests/unit/sharing/test_service.py`, `backend/python-api/tests/unit/realtime/test_realtime_service.py`, `backend/python-api/tests/integration/core/test_profile_authz_contract.py`
+	- Specs: `specs/features/008-backend-quality-overhaul-tasks.md`
+
 ## Validation Evidence (Task 8-10)
 - `uv run ruff check .` -> pass
 - `uv run mypy app tests` -> pass
@@ -142,6 +202,49 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - `.venv/Scripts/python.exe -m mypy app tests` -> pass
 - `.venv/Scripts/python.exe -m pytest -q` -> pass (57 passed, 3 warnings)
 - `uv pip check` -> pass
+
+## Validation Evidence (Feature 008 Slice 1)
+- `.venv/Scripts/python.exe -m ruff check .` -> pass
+- `.venv/Scripts/python.exe -m mypy app tests` -> pass
+- `.venv/Scripts/python.exe -m pytest -q` -> pass (60 passed, 3 warnings)
+
+## Validation Evidence (Feature 008 Slice 2)
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m ruff check .` -> pass
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m mypy app tests` -> pass
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m pytest -q tests/unit/sharing/test_service.py tests/integration/sharing/test_sharing_contract.py` -> pass (8 passed)
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m pytest -q` -> pass (60 passed, 3 warnings)
+
+## Validation Evidence (Feature 008 Slice 3)
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m ruff check .` -> pass
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m mypy app tests` -> pass
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m pytest -q tests/integration/core/test_profile_contract.py` -> pass (5 passed)
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m pytest -q` -> pass (60 passed, 3 warnings)
+
+## Validation Evidence (Feature 008 Slice 4)
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m ruff check .` -> pass
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m mypy app tests` -> pass
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m pytest -q tests/unit/lists/test_realtime_emission.py tests/unit/lists/test_reset_restore_service.py tests/integration/lists/test_contract.py tests/integration/lists/test_reset_restore_contract.py` -> pass (13 passed, 2 warnings)
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m pytest -q` -> pass (60 passed, 3 warnings)
+
+## Validation Evidence (Feature 008 Slice 5)
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m ruff check .` -> pass
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m mypy app tests` -> pass
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m pytest -q tests/integration/lists/test_contract.py tests/integration/lists/test_idempotency_contract.py tests/integration/lists/test_reset_restore_contract.py` -> pass (8 passed, 2 warnings)
+- `c:/Users/adrid/Desktop/Programas/ShoppingList/backend/python-api/.venv/Scripts/python.exe -m pytest -q` -> pass (60 passed, 3 warnings)
+- Manual smoke (live server): `GET /api/v1/lists` without bearer token -> `401 AUTH_TOKEN_INVALID` using python urllib request against local uvicorn instance.
+
+## Validation Evidence (Feature 008 Slice 6)
+- `uv run ruff check app tests` -> pass
+- `uv run mypy app tests` -> pass
+- `uv run pytest -q` -> pass (60 passed, 3 warnings)
+- Manual smoke (in-process app runtime): `GET /api/v1/lists` without bearer token -> `401 AUTH_TOKEN_INVALID` with response body `{"error": {"code": "AUTH_TOKEN_INVALID", "message": "Invalid or missing authentication token", ...}}`.
+
+## Validation Evidence (Feature 008 Slice 7)
+- `uv run ruff check app tests` -> pass
+- `uv run mypy app tests` -> pass
+- `uv run pytest -q tests/unit/notifications/test_notifications_service.py` -> pass (5 passed)
+- `uv run pytest -q tests/integration/core/test_profile_authz_contract.py` -> pass (5 passed)
+- `uv run pytest -q` -> pass (70 passed, 3 warnings)
 
 ## Session Continuity Notes (2026-03-21)
 - Local runtime stability hardening completed for backend make/scripts:
@@ -174,6 +277,41 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - Risks considered: contract drift between implementation and published docs, insufficient realtime confidence under collaboration flows, and incomplete deployment security evidence.
 - Controls applied: expanded contract/realtime integration suites, OpenAPI and WebSocket contract publication from runtime state, endpoint-level security checklist evidence, and dependency consistency check.
 - Residual risks: distributed throttling and cross-process websocket fan-out remain pending beyond MVP single-instance constraints.
+
+## Security Notes (Feature 008 Slice 1)
+- Risks considered: broken authentication behavior during exception model migration, token-auth response drift, and accidental sensitive error exposure.
+- Controls applied: centralized domain-to-transport mapping with safe structured error envelope, explicit auth repository boundary for query consistency, and regression coverage for auth and error contracts.
+- Residual risks: other modules still raise transport exceptions directly and remain pending migration in upcoming feature 008 slices.
+
+## Security Notes (Feature 008 Slice 2)
+- Risks considered: hidden context coupling causing accidental principal/session leakage and inconsistent authorization behavior across sharing operations.
+- Controls applied: explicit dependency injection (`db`, `principal`) from route boundary to sharing service operations, preserving existing auth/rate-limit controls and contract behavior.
+- Residual risks: hidden context dependency remains in `lists` and `notifications` services pending next slices.
+
+## Security Notes (Feature 008 Slice 3)
+- Risks considered: hidden context coupling on profile and notification preference workflows causing brittle auth boundary behavior.
+- Controls applied: explicit dependency injection (`db`, `principal`) from profile routes to notifications service functions while preserving route authentication and validation constraints.
+- Residual risks: hidden context dependency still remains in `lists` services and is pending next slice.
+
+## Security Notes (Feature 008 Slice 4)
+- Risks considered: hidden context coupling in list/item/reset/restore workflows causing brittle authorization/data-session boundaries.
+- Controls applied: explicit dependency injection (`db`, `principal`) from list routes through idempotency helpers into list services, preserving existing auth, validation, and idempotency checks.
+- Residual risks: service layers still contain transport exceptions and repeated error strings pending upcoming refactor slices.
+
+## Security Notes (Feature 008 Slice 5)
+- Risks considered: duplicated idempotency boundary logic in list mutation routes increasing drift risk for replay/conflict behavior.
+- Controls applied: consolidated route-level idempotency precheck/persist/replay flow behind one reusable helper to keep mutation handling deterministic and consistent.
+- Residual risks: transaction ownership is still mixed between repository commits and service-level transactions and remains pending Task 6 completion.
+
+## Security Notes (Feature 008 Slice 6)
+- Risks considered: partial writes due to mixed commit ownership, inconsistent event persistence ordering, and hidden transaction side effects across repositories.
+- Controls applied: repository writes now use `flush/refresh` only, service-level methods own transaction boundaries via explicit `db.begin()` contexts, and realtime event persistence + notify publish run in one service-owned transaction before websocket broadcast.
+- Residual risks: test architecture still includes monkeypatch-heavy slices pending Task 7 redesign.
+
+## Security Notes (Feature 008 Slice 7)
+- Risks considered: authentication/authorization regression on profile routes and hidden coupling from repeated ad-hoc unit transaction stubs.
+- Controls applied: behavior-first unauthorized coverage added for profile route family and shared transactional unit fixtures introduced to reduce local duplicated test wiring.
+- Residual risks: monkeypatch reduction across broader contract suite continues beyond this slice.
 
 ## Next Actions
 1. Create implementation plan per feature with impact labels:

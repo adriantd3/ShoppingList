@@ -33,7 +33,7 @@ async def create_share_link(
         created_by_user_id=created_by_user_id,
     )
     db.add(share_link)
-    await db.commit()
+    await db.flush()
     await db.refresh(share_link)
     return share_link
 
@@ -57,7 +57,7 @@ async def get_share_link_by_hash(db: AsyncSession, *, token_hash: str) -> ShareL
 async def revoke_share_link(db: AsyncSession, *, share_link: ShareLink, actor_user_id: str) -> ShareLink:
     share_link.revoked_at = datetime.now(UTC)
     share_link.revoked_by_user_id = actor_user_id
-    await db.commit()
+    await db.flush()
     await db.refresh(share_link)
     return share_link
 
@@ -67,7 +67,7 @@ async def expire_share_link(db: AsyncSession, *, share_link: ShareLink) -> Share
     share_link.expires_at = now
     if share_link.revoked_at is None:
         share_link.revoked_at = now
-    await db.commit()
+    await db.flush()
     await db.refresh(share_link)
     return share_link
 
@@ -103,5 +103,5 @@ async def upsert_member_role(
 
     membership = ListMembership(list_id=list_id, user_id=user_id, role=role)
     db.add(membership)
-    await db.commit()
+    await db.flush()
     return membership.role

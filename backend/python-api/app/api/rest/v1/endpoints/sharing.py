@@ -24,36 +24,55 @@ public_router = APIRouter(tags=["sharing"])
 async def issue_share_link(
     list_id: str,
     payload: ShareLinkIssueRequest,
-    _context: AuthenticatedContextDep,
+    context: AuthenticatedContextDep,
     _rate_limit: None = Depends(share_link_rate_limit_dependency()),
 ) -> ShareLinkIssueResponse:
-    return await issue_share_link_for_user(list_id=list_id, payload=payload)
+    return await issue_share_link_for_user(
+        db=context.db,
+        principal=context.principal,
+        list_id=list_id,
+        payload=payload,
+    )
 
 
 @lists_router.post("/{list_id}/share-links/{share_link_id}/revoke", response_model=ShareLinkResponse)
 async def revoke_share_link(
     list_id: str,
     share_link_id: str,
-    _context: AuthenticatedContextDep,
+    context: AuthenticatedContextDep,
     _rate_limit: None = Depends(share_link_rate_limit_dependency()),
 ) -> ShareLinkResponse:
-    return await revoke_share_link_for_user(list_id=list_id, share_link_id=share_link_id)
+    return await revoke_share_link_for_user(
+        db=context.db,
+        principal=context.principal,
+        list_id=list_id,
+        share_link_id=share_link_id,
+    )
 
 
 @lists_router.post("/{list_id}/share-links/{share_link_id}/expire", response_model=ShareLinkResponse)
 async def expire_share_link(
     list_id: str,
     share_link_id: str,
-    _context: AuthenticatedContextDep,
+    context: AuthenticatedContextDep,
     _rate_limit: None = Depends(share_link_rate_limit_dependency()),
 ) -> ShareLinkResponse:
-    return await expire_share_link_for_user(list_id=list_id, share_link_id=share_link_id)
+    return await expire_share_link_for_user(
+        db=context.db,
+        principal=context.principal,
+        list_id=list_id,
+        share_link_id=share_link_id,
+    )
 
 
 @public_router.post("/share-links/consume", response_model=ShareLinkConsumeResponse)
 async def consume_share_link(
     payload: ShareLinkConsumeRequest,
-    _context: AuthenticatedContextDep,
+    context: AuthenticatedContextDep,
     _rate_limit: None = Depends(share_link_rate_limit_dependency()),
 ) -> ShareLinkConsumeResponse:
-    return await consume_share_link_for_user(payload=payload)
+    return await consume_share_link_for_user(
+        db=context.db,
+        principal=context.principal,
+        payload=payload,
+    )

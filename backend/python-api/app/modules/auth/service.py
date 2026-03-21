@@ -1,51 +1,27 @@
-from sqlalchemy import Select, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.errors import ApiError, ErrorCode
+from app.core.domain_errors import AuthenticationServiceUnavailableError, InvalidCredentialsError
 from app.core.security import create_access_token, verify_password
-from app.db.models import AuthIdentity, User
+from app.modules.auth import repository
 from app.modules.auth.schemas import LoginRequest, TokenResponse, UserPrincipal
 
 
 async def authenticate_user(db: AsyncSession, payload: LoginRequest) -> UserPrincipal:
-    stmt: Select[tuple[User, AuthIdentity]] = (
-        select(User, AuthIdentity)
-        .join(AuthIdentity, AuthIdentity.user_id == User.id)
-        .where(User.email == payload.email)
-        .where(AuthIdentity.provider == "password")
-    )
     try:
-        result = await db.execute(stmt)
+        row = await repository.get_user_with_password_identity(db, email=payload.email)
     except SQLAlchemyError as exc:
-        raise ApiError(
-            code=ErrorCode.INTERNAL_ERROR,
-            message="Authentication service temporarily unavailable",
-            status_code=503,
-        ) from exc
-    row = result.first()
+        raise AuthenticationServiceUnavailableError() from exc
 
     if not row:
-        raise ApiError(
-            code=ErrorCode.AUTH_INVALID_CREDENTIALS,
-            message="Invalid credentials",
-            status_code=401,
-        )
+        raise InvalidCredentialsError()
 
     user, identity = row
     if not user.is_active:
-        raise ApiError(
-            code=ErrorCode.AUTH_INVALID_CREDENTIALS,
-            message="Invalid credentials",
-            status_code=401,
-        )
+        raise InvalidCredentialsError()
 
     if not identity.password_hash or not verify_password(payload.password, identity.password_hash):
-        raise ApiError(
-            code=ErrorCode.AUTH_INVALID_CREDENTIALS,
-            message="Invalid credentials",
-            status_code=401,
-        )
+        raise InvalidCredentialsError()
 
     return UserPrincipal(user_id=user.id, email=user.email)
 

@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
 from types import SimpleNamespace
+from typing import Any, cast
 from unittest.mock import AsyncMock
 
 import pytest
@@ -8,7 +9,10 @@ from app.modules.realtime import service
 
 
 @pytest.mark.asyncio
-async def test_emit_list_event_persists_notifies_and_broadcasts(monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_emit_list_event_persists_notifies_and_broadcasts(
+    monkeypatch: pytest.MonkeyPatch,
+    transactional_session: Any,
+) -> None:
     created_event = SimpleNamespace(
         id="event-1",
         event_type="list.item.created",
@@ -26,7 +30,7 @@ async def test_emit_list_event_persists_notifies_and_broadcasts(monkeypatch: pyt
     monkeypatch.setattr(service.connection_manager, "broadcast_event", broadcast_mock)
 
     envelope = await service.emit_list_event(
-        AsyncMock(),
+        cast(Any, transactional_session),
         list_id="list-1",
         actor_user_id="user-1",
         event_type="list.item.created",

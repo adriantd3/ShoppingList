@@ -1,7 +1,8 @@
+from typing import Any, cast
+
 import pytest
 
-from app.core.request_context import clear_request_context, set_request_context
-from app.modules.auth.context import AuthenticatedContext
+from app.modules.auth.schemas import UserPrincipal
 from app.modules.sharing.service import hash_share_token
 
 
@@ -22,17 +23,20 @@ def test_hash_share_token_does_not_return_plaintext() -> None:
 
 
 @pytest.mark.asyncio
-async def test_consume_share_link_emits_member_joined_for_new_member(monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_consume_share_link_emits_member_joined_for_new_member(
+    monkeypatch: pytest.MonkeyPatch,
+    transactional_session: Any,
+    principal_user: UserPrincipal,
+) -> None:
     from datetime import UTC, datetime, timedelta
     from types import SimpleNamespace
     from unittest.mock import AsyncMock
 
-    from app.modules.auth.schemas import UserPrincipal
     from app.modules.sharing import service
     from app.modules.sharing.schemas import ShareLinkConsumeRequest
 
-    principal = UserPrincipal(user_id="user-1", email="user@example.com")
-    db = AsyncMock()
+    principal = principal_user
+    db = transactional_session
 
     monkeypatch.setattr(
         service.repository,
@@ -50,12 +54,11 @@ async def test_consume_share_link_emits_member_joined_for_new_member(monkeypatch
     emit_mock = AsyncMock()
     monkeypatch.setattr(service, "emit_list_event", emit_mock)
 
-    context = AuthenticatedContext(db=db, principal=principal)
-    token = set_request_context(context)
-    try:
-        result = await service.consume_share_link_for_user(payload=ShareLinkConsumeRequest(token="token-value-at-least-20"))
-    finally:
-        clear_request_context(token)
+    result = await service.consume_share_link_for_user(
+        db=cast(Any, db),
+        principal=principal,
+        payload=ShareLinkConsumeRequest(token="token-value-at-least-20"),
+    )
 
     assert result.list_id == "list-1"
     assert result.membership_role == "member"

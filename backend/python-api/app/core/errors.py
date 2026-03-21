@@ -9,12 +9,14 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from app.core.config import get_settings
+from app.core.domain_errors import DomainError
 
 
 class ErrorCode(StrEnum):
     AUTH_INVALID_CREDENTIALS = "AUTH_INVALID_CREDENTIALS"
     AUTH_EMAIL_NOT_VERIFIED = "AUTH_EMAIL_NOT_VERIFIED"
     AUTH_TOKEN_INVALID = "AUTH_TOKEN_INVALID"
+    AUTH_SERVICE_UNAVAILABLE = "AUTH_SERVICE_UNAVAILABLE"
     FORBIDDEN_LIST_ACCESS = "FORBIDDEN_LIST_ACCESS"
     LIST_NOT_FOUND = "LIST_NOT_FOUND"
     ITEM_NOT_FOUND = "ITEM_NOT_FOUND"
@@ -94,6 +96,26 @@ def build_error_response(
 
 
 def install_exception_handlers(app: FastAPI) -> None:
+    domain_status_map: dict[ErrorCode, int] = {
+        ErrorCode.AUTH_INVALID_CREDENTIALS: status.HTTP_401_UNAUTHORIZED,
+        ErrorCode.AUTH_TOKEN_INVALID: status.HTTP_401_UNAUTHORIZED,
+        ErrorCode.AUTH_SERVICE_UNAVAILABLE: status.HTTP_503_SERVICE_UNAVAILABLE,
+    }
+
+    @app.exception_handler(DomainError)
+    async def handle_domain_error(request: Request, exc: DomainError) -> JSONResponse:
+        code = ErrorCode(exc.code) if exc.code in ErrorCode._value2member_map_ else ErrorCode.INTERNAL_ERROR
+        status_code = domain_status_map.get(code, status.HTTP_400_BAD_REQUEST)
+        if code == ErrorCode.INTERNAL_ERROR:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return build_error_response(
+            request,
+            code=code,
+            message=exc.message,
+            status_code=status_code,
+            details=exc.details,
+        )
+
     @app.exception_handler(ApiError)
     async def handle_api_error(request: Request, exc: ApiError) -> JSONResponse:
         return build_error_response(

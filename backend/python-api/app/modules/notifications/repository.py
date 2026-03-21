@@ -14,7 +14,7 @@ async def get_user_by_id(db: AsyncSession, *, user_id: str) -> User | None:
 
 async def update_user_display_name(db: AsyncSession, *, user: User, display_name: str) -> User:
     user.display_name = display_name
-    await db.commit()
+    await db.flush()
     await db.refresh(user)
     return user
 
@@ -45,7 +45,7 @@ async def upsert_notification_preferences(
         preferences.list_change_push_enabled = list_change_push_enabled
         preferences.updated_at = now
 
-    await db.commit()
+    await db.flush()
     await db.refresh(preferences)
     return preferences
 
@@ -78,6 +78,6 @@ async def upsert_device_push_token(
     else:
         token.last_seen_at = now
 
-    await db.commit()
+    await db.flush()
     await db.refresh(token)
     return token

@@ -51,21 +51,21 @@ async def create_list(db: AsyncSession, *, name: str, owner_user_id: str) -> Sho
         role="owner",
     )
     db.add(owner_membership)
-    await db.commit()
+    await db.flush()
     await db.refresh(shopping_list)
     return shopping_list
 
 
 async def update_list_name(db: AsyncSession, shopping_list: ShoppingList, name: str) -> ShoppingList:
     shopping_list.name = name
-    await db.commit()
+    await db.flush()
     await db.refresh(shopping_list)
     return shopping_list
 
 
 async def delete_list(db: AsyncSession, shopping_list: ShoppingList) -> None:
     await db.delete(shopping_list)
-    await db.commit()
+    await db.flush()
 
 
 async def get_next_sort_index(db: AsyncSession, list_id: str) -> int:
@@ -110,7 +110,7 @@ async def create_item(
         updated_by_user_id=actor_user_id,
     )
     db.add(item)
-    await db.commit()
+    await db.flush()
     await db.refresh(item)
     return item
 
@@ -129,14 +129,14 @@ async def update_item(db: AsyncSession, item: ListItem, *, actor_user_id: str, c
     for field_name, field_value in changes.items():
         setattr(item, field_name, field_value)
     item.updated_by_user_id = actor_user_id
-    await db.commit()
+    await db.flush()
     await db.refresh(item)
     return item
 
 
 async def delete_item(db: AsyncSession, item: ListItem) -> None:
     await db.delete(item)
-    await db.commit()
+    await db.flush()
 
 
 def serialize_items_snapshot(items: list[ListItem]) -> list[dict[str, object]]:

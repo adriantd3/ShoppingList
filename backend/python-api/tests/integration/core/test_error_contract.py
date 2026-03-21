@@ -26,4 +26,4 @@ def test_lists_requires_bearer_token(client: TestClient) -> None:
     assert response.status_code == 401
     payload = response.json()
     assert payload["error"]["code"] == "AUTH_TOKEN_INVALID"
-    assert payload["error"]["message"] == "Missing bearer token"
+    assert payload["error"]["message"] == "Invalid or missing authentication token"

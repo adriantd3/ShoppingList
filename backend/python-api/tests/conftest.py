@@ -1,5 +1,7 @@
 import os
-from collections.abc import Generator
+from collections.abc import AsyncIterator, Generator
+from contextlib import asynccontextmanager
+from typing import Any, cast
 
 import pytest
 from fastapi.testclient import TestClient
@@ -9,6 +11,7 @@ os.environ.setdefault("APP_ENV", "test")
 os.environ.setdefault("ENABLE_DOCS", "false")
 
 from app.main import create_app
+from app.modules.auth.schemas import UserPrincipal
 
 
 @pytest.fixture
@@ -16,3 +19,19 @@ def client() -> Generator[TestClient, None, None]:
     app = create_app()
     with TestClient(app) as test_client:
         yield test_client
+
+
+class DummyTransactionalSession:
+    @asynccontextmanager
+    async def begin(self) -> AsyncIterator[None]:
+        yield
+
+
+@pytest.fixture
+def transactional_session() -> Any:
+    return cast(Any, DummyTransactionalSession())
+
+
+@pytest.fixture
+def principal_user() -> UserPrincipal:
+    return UserPrincipal(user_id="user-1", email="user@example.com")

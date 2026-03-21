@@ -19,7 +19,7 @@ async def create_realtime_event(
         idempotency_key=idempotency_key,
     )
     db.add(event)
-    await db.commit()
+    await db.flush()
     await db.refresh(event)
     return event
 
@@ -38,4 +38,3 @@ async def publish_notify(
         text("SELECT pg_notify(:channel, :payload)"),
         {"channel": channel, "payload": payload},
     )
-    await db.commit()
