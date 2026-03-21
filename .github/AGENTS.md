@@ -65,3 +65,10 @@ Before proposing changes, the agent should identify whether the feature impacts 
 ## Core Principles
 - Simplicity first: change the minimum code required to satisfy requirements.
 - No laziness: find root causes; avoid temporary fixes.
+
+## Backend Test Layout Convention
+- For `backend/python-api`, keep all tests under `backend/python-api/tests` (never under `backend/python-api/app/tests`).
+- Organize tests by layer and module:
+	- `tests/unit/<module>/...`
+	- `tests/integration/<module>/...`
+- Keep only shared fixtures at `tests/conftest.py`.

@@ -44,14 +44,17 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- Authorization policy baseline with deny-by-default list membership/owner checks.
 	- Standardized error contract with stable error codes and trace IDs.
 	- Validation baseline executed successfully (`ruff`, `mypy`, `pytest`).
+- Test layout convention normalized for backend Python API:
+	- Removed unused `backend/python-api/app/tests` remnant.
+	- Tests organized by layer and module under `backend/python-api/tests/unit/<module>/` and `backend/python-api/tests/integration/<module>/`.
+	- Structural guard test added to fail CI if `app/tests` or flat test files under layer roots reappear.
 
 ## Open Gaps
-- Traceability entries still point to planned code/test paths (placeholders) until implementation begins.
 - No migration execution yet from Java modules to Python runtime path.
 - No frontend migration execution yet from existing UI components to Tamagui.
 - UI screen-map, technical design, and implementation task breakdown are defined for feature 006.
 - No explicit performance/load validation runs yet for NFR targets.
-- Feature 007 tasks 7-20 remain pending (lists/items contracts, idempotency, sharing lifecycle, reset/restore, realtime, hardening, full contract/integration/realtime suites).
+- Feature 007 tasks 8-20 remain pending (idempotency, sharing lifecycle, reset/restore, realtime, hardening, full contract/integration/realtime suites).
 
 ## Traceability Update (Feature 007 Milestone A)
 - FR-backend-11, NFR-01, NFR-03
@@ -66,6 +69,9 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - FR-backend-03, FR-backend-05
 	- Code: `backend/python-api/app/modules/auth/dependencies.py`, `backend/python-api/app/modules/auth/service.py`, `backend/python-api/app/modules/lists/policies.py`, `backend/python-api/app/api/ws/auth.py`
 	- Tests: `backend/python-api/tests/test_security.py`, `backend/python-api/tests/test_error_contract.py`
+- FR-backend-03, FR-backend-08 (Milestone B - Task 7)
+	- Code: `backend/python-api/app/api/rest/v1/endpoints/lists.py`, `backend/python-api/app/modules/lists/schemas.py`, `backend/python-api/app/modules/lists/catalogs.py`, `backend/python-api/app/modules/lists/service.py`, `backend/python-api/app/modules/lists/repository.py`
+	- Tests: `backend/python-api/tests/test_lists_contract.py`
 
 ## Next Actions
 1. Create implementation plan per feature with impact labels:
@@ -74,7 +80,7 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- `003-shared-realtime-list`: full-stack
 	- `004-template-and-reset`: full-stack
 	- `005-platform-and-stack`: backend + frontend + devops
-2. Start Milestone B for feature 007 (tasks 7-10): lists/items contracts, idempotency, sharing lifecycle, reset/restore semantics.
+2. Continue Milestone B for feature 007 (tasks 8-10): idempotency, sharing lifecycle, reset/restore semantics.
 3. Define Tamagui design tokens and base component layer for React Native screens.
 4. Begin phase-4 execution for `006-ui-screen-map` following `006-ui-screen-map-tasks.md`.
 5. Implement auth and list domains first (`001`, `002`) to unlock MVP usage.

@@ -43,7 +43,7 @@
   - Add trace_id correlation in all error responses.
   - Requirement: FR-backend-10
 
-- [ ] 7. Implement lists and items REST contracts
+- [x] 7. Implement lists and items REST contracts
   - Build CRUD routes for lists and items with strict validation.
   - Enforce category and predefined unit constraints.
   - Implement deterministic sort/index behavior for list items.
@@ -185,3 +185,19 @@
 - Risks considered: internal info leakage, inconsistent frontend handling, missing traceability for incidents.
 - Controls applied: centralized `ApiError` mapping with stable machine-readable codes, safe production message policy, `trace_id` in headers and body.
 - Residual risks: centralized audit/event logging for incident pipelines is pending.
+
+## Milestone B Progress Notes (2026-03-21)
+- Task 7 executed (lists/items REST contracts):
+  - Added list and item endpoints under `app/api/rest/v1/endpoints/lists.py`.
+  - Added strict request/response schemas and predefined category/unit validation.
+  - Added list/item service and repository methods with deterministic list item ordering (`sort_index`, `updated_at`, `id`).
+  - Added contract tests for list creation and list-item validation behavior.
+  - Validation evidence:
+    - `uv run ruff check .` -> pass
+    - `uv run mypy app tests` -> pass
+    - `uv run pytest` -> pass (8 passed)
+
+### Security notes - Block 7 (Task 7: lists/items contracts)
+- Risks considered: broken access control, malformed input leading to inconsistent state, error response leakage.
+- Controls applied: authenticated route dependencies, strict schema validation with forbidden unknown fields, deterministic item ordering, safe validation error serialization.
+- Residual risks: endpoint-level rate limiting and payload size throttling remain scheduled for Milestone C hardening.

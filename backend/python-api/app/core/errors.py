@@ -3,6 +3,7 @@ from typing import Any
 from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -107,7 +108,7 @@ def install_exception_handlers(app: FastAPI) -> None:
             code=ErrorCode.VALIDATION_ERROR,
             message="Validation failed",
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            details={"errors": exc.errors()},
+            details={"errors": jsonable_encoder(exc.errors())},
         )
 
     @app.exception_handler(HTTPException)
