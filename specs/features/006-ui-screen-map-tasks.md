@@ -7,37 +7,37 @@
 
 ## Tasks
 
-- [ ] 1. Bootstrap new mobile app workspace
+- [x] 1. Bootstrap new mobile app workspace
   - Create a new React Native + Expo project scaffold for MVP runtime.
   - Add initial folder structure for app routes, components, features, services, and tests.
   - Ensure legacy frontend is not part of MVP runtime.
   - Requirement: FR-platform-10, FR-platform-11, FR-ui-18
 
-- [ ] 2. Install and configure core dependencies
+- [x] 2. Install and configure core dependencies
   - Install Expo Router, Tamagui, React Query, secure storage, network status, and notification dependencies.
   - Lock dependency versions to stable compatible set with selected Expo SDK.
   - Add baseline scripts for lint, test, and typecheck.
   - Requirement: FR-platform-11, FR-ui-18
 
-- [ ] 3. Implement root providers and route guards
+- [x] 3. Implement root providers and route guards
   - Implement app root layout with providers for auth, query cache, connectivity, and theme.
   - Add first-launch guard for onboarding flow.
   - Add auth guard for protected routes.
   - Requirement: FR-ui-01, FR-ui-02, FR-ui-03, FR-ui-14
 
-- [ ] 4. Implement onboarding flow with push permission
+- [x] 4. Implement onboarding flow with push permission
   - Build first-run onboarding screen sequence.
   - Request push permission in onboarding and store result.
   - Add fallback path when permission is denied.
   - Requirement: FR-ui-14, FR-ui-16, FR-ui-11
 
-- [ ] 5. Implement authentication screens and navigation
+- [x] 5. Implement authentication screens and navigation
   - Build login, register, forgot-password, and verify-email screens.
   - Wire navigation transitions between auth screens.
   - Connect auth actions to API contracts and session persistence.
   - Requirement: FR-ui-01, FR-ui-04
 
-- [ ] 6. Implement tab shell and app entry routing
+- [x] 6. Implement tab shell and app entry routing
   - Build two-tab layout (Lists, Profile).
   - Implement post-auth redirection to last active list.
   - Fallback to lists collection if no active list exists.

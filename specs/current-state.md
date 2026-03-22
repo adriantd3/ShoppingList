@@ -1,8 +1,8 @@
 # Current State
 
 ## Snapshot
-Date: 2026-03-21
-Method: Spec-Driven Development through phase-3 planning for UI feature
+Date: 2026-03-22
+Method: Spec-Driven Development with Feature 006 Milestone A implementation evidence
 Context: Brownfield repository with existing frontend and backend codebases, with new target architecture decisions
 
 ## What Exists
@@ -53,12 +53,21 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- Removed unused `backend/python-api/app/tests` remnant.
 	- Tests organized by layer and module under `backend/python-api/tests/unit/<module>/` and `backend/python-api/tests/integration/<module>/`.
 	- Structural guard test added to fail CI if `app/tests` or flat test files under layer roots reappear.
+- Feature 006 Milestone A (tasks 1-6) implemented in `frontend/mobile-app`:
+	- New Expo + TypeScript runtime scaffold created as canonical MVP frontend.
+	- Core dependency set installed: Expo Router, Tamagui, React Query, secure storage, AsyncStorage, NetInfo, notifications.
+	- Root provider composition and route guards wired for first-launch, auth, and tabs gating.
+	- Onboarding route implemented with push permission request and persisted completion state.
+	- Auth route group implemented (login/register/forgot-password/verify-email) with session persistence.
+	- Two-tab shell implemented (`Lists`, `Profile`) with last-active-list local persistence and post-auth entry routing.
+	- Navigation guard integration tests added for onboarding/auth/last-active routing decisions.
 
 ## Open Gaps
 - Legacy Java module archive/removal plan is pending execution (modules are record-only and out of active development).
 - UI screen-map, technical design, and implementation task breakdown are defined for feature 006.
 - No explicit performance/load validation runs yet for NFR targets.
 - Feature 007 Milestone D is complete (tasks 15-20 executed: contract/realtime integration suites, security evidence rollup, contract publication, and final traceability sweep).
+- Feature 006 Milestone A is complete; Milestone B remains pending (tasks 7-13).
 
 ## Requirements Lock Update (2026-03-22)
 - Locked auth session policy for MVP:
@@ -345,6 +354,33 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - Controls applied: behavior-first unauthorized coverage added for profile route family and shared transactional unit fixtures introduced to reduce local duplicated test wiring.
 - Residual risks: monkeypatch reduction across broader contract suite continues beyond this slice.
 
+## Traceability Update (Feature 006 Milestone A)
+- FR-platform-10, FR-platform-11, FR-ui-18 (Task 1, Task 2)
+	- Code: `frontend/mobile-app/package.json`, `frontend/mobile-app/app.json`, `frontend/mobile-app/babel.config.js`, `frontend/mobile-app/eslint.config.js`, `frontend/mobile-app/tsconfig.json`
+	- Tests: validation gate (`npm run typecheck`, `npx eslint app src tests --ext .ts,.tsx`)
+- FR-ui-01, FR-ui-02, FR-ui-03, FR-ui-14 (Task 3)
+	- Code: `frontend/mobile-app/app/_layout.tsx`, `frontend/mobile-app/src/providers/RootProviders.tsx`, `frontend/mobile-app/src/providers/AuthSessionProvider.tsx`, `frontend/mobile-app/src/providers/AppPreferencesProvider.tsx`, `frontend/mobile-app/src/providers/ConnectivityProvider.tsx`, `frontend/mobile-app/src/navigation/routeResolution.ts`
+	- Tests: `frontend/mobile-app/tests/integration/navigation/route-resolution.test.ts`
+- FR-ui-14, FR-ui-16, FR-ui-11 (Task 4)
+	- Code: `frontend/mobile-app/app/onboarding/index.tsx`, `frontend/mobile-app/src/services/storage/appStorage.ts`
+	- Tests: `frontend/mobile-app/tests/integration/navigation/route-resolution.test.ts`
+- FR-ui-01, FR-ui-04 (Task 5)
+	- Code: `frontend/mobile-app/app/(auth)/_layout.tsx`, `frontend/mobile-app/app/(auth)/login.tsx`, `frontend/mobile-app/app/(auth)/register.tsx`, `frontend/mobile-app/app/(auth)/forgot-password.tsx`, `frontend/mobile-app/app/(auth)/verify-email.tsx`, `frontend/mobile-app/src/services/auth/authApi.ts`, `frontend/mobile-app/src/services/auth/sessionStorage.ts`
+	- Tests: `frontend/mobile-app/tests/integration/navigation/route-resolution.test.ts`
+- FR-ui-02, FR-ui-03 (Task 6)
+	- Code: `frontend/mobile-app/app/(tabs)/_layout.tsx`, `frontend/mobile-app/app/(tabs)/lists/index.tsx`, `frontend/mobile-app/app/(tabs)/lists/[listId].tsx`, `frontend/mobile-app/app/(tabs)/profile/index.tsx`, `frontend/mobile-app/src/services/storage/appStorage.ts`
+	- Tests: `frontend/mobile-app/tests/integration/navigation/route-resolution.test.ts`
+
+## Validation Evidence (Feature 006 Milestone A)
+- `npm run typecheck` (frontend/mobile-app) -> pass
+- `npm run test` (frontend/mobile-app) -> pass (6 passed)
+- `npx eslint app src tests --ext .ts,.tsx` (frontend/mobile-app) -> pass
+
+## Security Notes (Feature 006 Milestone A)
+- Risks considered: insecure session persistence, local data leakage from routing state, and permission-flow dead ends in onboarding.
+- Controls applied: access token persisted with `expo-secure-store`, non-sensitive last-active-list id persisted with AsyncStorage, push permission request handled with deny-safe continuation path, and no secret/token values logged in screen flows.
+- Residual risks: refresh-token lifecycle and full auth error taxonomy are deferred to Feature 001 auth implementation slices.
+
 ## Next Actions
 1. Create implementation plan per feature with impact labels:
 	- `001-auth`: full-stack
@@ -354,7 +390,7 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- `005-platform-and-stack`: backend + frontend + devops
 2. Begin implementation execution for feature `001-auth` with backend/frontend traceability updates.
 3. Define Tamagui design tokens and base component layer for React Native screens.
-4. Begin phase-4 execution for `006-ui-screen-map` following `006-ui-screen-map-tasks.md`.
+4. Begin Milestone B execution for `006-ui-screen-map` (tasks 7-13) following `006-ui-screen-map-tasks.md`.
 5. Implement auth and list domains first (`001`, `002`) to unlock MVP usage.
 6. Implement collaboration and reset workflows (`003`, `004`) with integration tests.
 7. Extend backend test suites with integration and contract coverage for new routes.
