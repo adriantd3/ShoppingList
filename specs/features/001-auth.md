@@ -5,11 +5,12 @@ Provide low-friction authentication for a family-oriented MVP using email/passwo
 
 ## Requirements
 - FR-auth-01: A user can register and sign in with email and password.
-- FR-auth-02: A user can sign in with Google.
-- FR-auth-03: A user can sign in with Apple.
-- FR-auth-04: The system issues and validates JWT-based sessions for mobile clients.
+- FR-auth-02: A user can sign in with Google using Authorization Code + PKCE via system browser flow.
+- FR-auth-03: A user can sign in with Apple using Authorization Code + PKCE via system browser flow.
+- FR-auth-04: The system issues and validates JWT-based access (15 minutes) and refresh (30 days) sessions for mobile clients.
 - FR-auth-05: The system rejects invalid credentials with actionable error messages.
-- FR-auth-06: The system allows explicit sign-out from active session.
+- FR-auth-06: The system allows explicit sign-out from active session on current device only.
+- FR-auth-07: The system rotates refresh tokens on every refresh and invalidates previous refresh token.
 - NFR-01: The auth module must be implementable with open source components in a FastAPI backend.
 - NFR-02: 95% of successful sign-in requests should complete in <= 1500 ms under MVP expected load.
 
@@ -20,7 +21,9 @@ Provide low-friction authentication for a family-oriented MVP using email/passwo
 - When a user completes Google OAuth successfully, the system shall authenticate and return an access token.
 - When a user completes Apple OAuth successfully, the system shall authenticate and return an access token.
 - While a user holds a valid session token, when protected endpoints are requested, the system shall authorize the request.
-- When a user signs out, the system shall invalidate or expire the active mobile session according to configured token policy.
+- When a user refreshes a session successfully, the system shall return a new refresh token and invalidate the previously used refresh token.
+- When a user signs out, the system shall invalidate the active mobile session for the current device and keep other device sessions active.
+- While measuring auth performance under MVP baseline, when 100 successful sign-in requests are executed at 10 concurrent virtual users in warm-runtime conditions, the system shall keep p95 latency <= 1500 ms.
 
 ## Planned Tasks
 - Define auth domain model and token lifecycle in backend API contract.

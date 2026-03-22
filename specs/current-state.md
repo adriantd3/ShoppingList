@@ -61,6 +61,22 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - No explicit performance/load validation runs yet for NFR targets.
 - Feature 007 Milestone D is complete (tasks 15-20 executed: contract/realtime integration suites, security evidence rollup, contract publication, and final traceability sweep).
 
+## Requirements Lock Update (2026-03-22)
+- Locked auth session policy for MVP:
+	- Access/refresh JWT model with explicit durations (15m access, 30d refresh).
+	- Refresh token rotation on every refresh; previous refresh token invalidated.
+	- Logout scope locked to current device session only.
+- Locked mobile OAuth transport policy:
+	- Google and Apple auth use Authorization Code + PKCE via system browser flow.
+- Locked offline mutation scope:
+	- MVP supports offline read plus queued item mutations (create/edit/delete/check-uncheck) with reconnect sync.
+- Locked deterministic realtime tie-break policy:
+	- Last-write-wins ordered by server committed timestamp, then monotonic event id tie-break.
+- Locked reset retention policy:
+	- Keep latest pre-reset snapshot only, expiring after 30 days.
+- Locked performance validation profile (MVP baseline):
+	- Warm-runtime measurements, 100 requests, 10 concurrent virtual users, p95 target validation per feature threshold.
+
 ## Milestone D Execution Status (Feature 007)
 - Completed scope:
 	- Contract suite expansion for auth and websocket envelope validation.

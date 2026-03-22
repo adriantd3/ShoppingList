@@ -17,6 +17,7 @@ Provide a practical post-login home screen where users can open the active shopp
 - When the user creates a new list, the system shall persist the list and show it in the home screen list.
 - While lists exist for the user, when the home screen is refreshed, the system shall return current list state from backend.
 - When a list has completed shopping state, the system shall show visual status that distinguishes it from actively edited lists.
+- While measuring dashboard load performance under MVP baseline, when 100 successful list-summary requests are executed at 10 concurrent virtual users in warm-runtime conditions, the system shall keep p95 latency <= 1200 ms.
 
 ## Planned Tasks
 - Define home/list-summary API contract.
