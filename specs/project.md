@@ -31,5 +31,7 @@ Out of scope (for now):
 ## Success Criteria
 - Every implemented feature has a spec file in `specs/features/`.
 - Every feature has acceptance criteria and linked tests.
+- Every implementation task has explicit test scope and passing evidence.
+- Tests validate behavior (including negative paths), not just implementation internals.
 - Agent guidance remains concise and actionable.
 - Mobile UI is built primarily on a shared component system (Tamagui) instead of custom one-off components.

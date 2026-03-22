@@ -2,7 +2,7 @@
 
 ## Snapshot
 Date: 2026-03-22
-Method: Spec-Driven Development with Feature 006 Milestone A implementation evidence
+Method: Spec-Driven Development with Feature 006 Milestone B implementation evidence
 Context: Brownfield repository with existing frontend and backend codebases, with new target architecture decisions
 
 ## What Exists
@@ -67,7 +67,7 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - UI screen-map, technical design, and implementation task breakdown are defined for feature 006.
 - No explicit performance/load validation runs yet for NFR targets.
 - Feature 007 Milestone D is complete (tasks 15-20 executed: contract/realtime integration suites, security evidence rollup, contract publication, and final traceability sweep).
-- Feature 006 Milestone A is complete; Milestone B remains pending (tasks 7-13).
+- Feature 006 Milestone A and Milestone B are complete (tasks 1-13).
 
 ## Requirements Lock Update (2026-03-22)
 - Locked auth session policy for MVP:
@@ -101,6 +101,10 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 - Locked deployment topology for MVP:
 	- MVP deploys as a single-instance monolith.
 	- Multi-instance scaling concerns are deferred to post-MVP hardening.
+- Locked SDD testing policy for future tasks:
+	- Every implementation task must define test scope before coding.
+	- Task completion requires passing tests mapped to requirement IDs.
+	- Test quality must prioritize behavior and negative paths over implementation-coupled assertions.
 
 ## Milestone D Execution Status (Feature 007)
 - Completed scope:
@@ -371,15 +375,62 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- Code: `frontend/mobile-app/app/(tabs)/_layout.tsx`, `frontend/mobile-app/app/(tabs)/lists/index.tsx`, `frontend/mobile-app/app/(tabs)/lists/[listId].tsx`, `frontend/mobile-app/app/(tabs)/profile/index.tsx`, `frontend/mobile-app/src/services/storage/appStorage.ts`
 	- Tests: `frontend/mobile-app/tests/integration/navigation/route-resolution.test.ts`
 
+## Traceability Update (Feature 006 Milestone B - Task 7)
+- FR-ui-05, FR-ui-12, FR-ui-13
+	- Code: `frontend/mobile-app/app/(tabs)/lists/index.tsx`, `frontend/mobile-app/app/(tabs)/lists/history.tsx`, `frontend/mobile-app/src/services/lists/listsApi.ts`, `frontend/mobile-app/src/features/lists/types.ts`, `frontend/mobile-app/src/features/lists/summaryMetadata.ts`, `frontend/mobile-app/src/ui/ListSummaryCard.tsx`, `frontend/mobile-app/src/ui/EmptyStatePanel.tsx`, `frontend/mobile-app/src/ui/ErrorStatePanel.tsx`, `frontend/mobile-app/src/ui/OfflineBanner.tsx`
+	- Tests: `frontend/mobile-app/tests/integration/lists/lists-api.test.ts`, `frontend/mobile-app/tests/integration/lists/summary-metadata.test.ts`, `frontend/mobile-app/tests/unit/lists/task7-list-summary-mapping.test.ts`
+
+## Traceability Update (Feature 006 Milestone B - Tasks 8-13)
+- FR-ui-06, FR-ui-08, FR-ui-13, NFR-01 (Task 8)
+	- Code: `frontend/mobile-app/app/(tabs)/lists/[listId].tsx`, `frontend/mobile-app/src/ui/InlineAddBar.tsx`, `frontend/mobile-app/src/ui/ItemRow.tsx`, `frontend/mobile-app/src/features/lists/activeListLogic.ts`
+	- Tests: `frontend/mobile-app/tests/integration/lists/lists-api.test.ts`, `frontend/mobile-app/tests/unit/lists/active-list-logic.test.ts`
+- FR-ui-06, FR-ui-07, FR-ui-13 (Task 9)
+	- Code: `frontend/mobile-app/app/modal/item-editor.tsx`, `frontend/mobile-app/src/features/lists/catalogs.ts`, `frontend/mobile-app/src/features/lists/types.ts`, `frontend/mobile-app/src/services/lists/listsApi.ts`, `frontend/mobile-app/src/features/lists/itemEditorLogic.ts`
+	- Tests: `frontend/mobile-app/tests/integration/lists/lists-api.test.ts`, `frontend/mobile-app/tests/unit/lists/item-editor-logic.test.ts`
+- FR-ui-15 (Task 10)
+	- Code: `frontend/mobile-app/src/ui/DangerConfirmDialog.tsx`, `frontend/mobile-app/app/(tabs)/lists/[listId].tsx`, `frontend/mobile-app/app/modal/confirm-action.tsx`
+	- Tests: `frontend/mobile-app/tests/integration/lists/lists-api.test.ts`, `frontend/mobile-app/tests/unit/lists/danger-confirm-dialog.test.tsx`
+- FR-ui-09 (Task 11)
+	- Code: `frontend/mobile-app/app/(tabs)/lists/members.tsx`, `frontend/mobile-app/app/(tabs)/lists/share.tsx`, `frontend/mobile-app/src/services/lists/listsApi.ts`
+	- Tests: `frontend/mobile-app/tests/integration/lists/lists-api.test.ts`, `frontend/mobile-app/tests/unit/lists/share-link-mapper.test.ts`
+- FR-ui-10, FR-ui-11 (Task 12)
+	- Code: `frontend/mobile-app/app/(tabs)/profile/index.tsx`, `frontend/mobile-app/app/(tabs)/profile/about.tsx`, `frontend/mobile-app/app/(tabs)/profile/notifications.tsx`, `frontend/mobile-app/src/services/lists/listsApi.ts`, `frontend/mobile-app/src/features/profile/aboutMetadata.ts`
+	- Tests: `frontend/mobile-app/tests/integration/lists/lists-api.test.ts`, `frontend/mobile-app/tests/unit/profile/about-metadata.test.ts`
+- FR-ui-12, FR-ui-13 (Task 13)
+	- Code: `frontend/mobile-app/app/(tabs)/lists/history.tsx`, `frontend/mobile-app/src/services/lists/listsApi.ts`, `frontend/mobile-app/src/features/lists/historyLogic.ts`
+	- Tests: `frontend/mobile-app/tests/integration/lists/lists-api.test.ts`, `frontend/mobile-app/tests/unit/lists/history-logic.test.ts`
+
 ## Validation Evidence (Feature 006 Milestone A)
 - `npm run typecheck` (frontend/mobile-app) -> pass
 - `npm run test` (frontend/mobile-app) -> pass (6 passed)
 - `npx eslint app src tests --ext .ts,.tsx` (frontend/mobile-app) -> pass
 
+## Validation Evidence (Feature 006 Milestone B - Task 7)
+- `npm run typecheck` (frontend/mobile-app) -> pass
+- `npm run lint` (frontend/mobile-app) -> pass
+- `npm run test` (frontend/mobile-app) -> pass (15 passed)
+- Manual smoke (Expo boot): `npm run start` (frontend/mobile-app) -> pass (Metro started and app routes compiled, then process stopped).
+
+## Validation Evidence (Feature 006 Milestone B - Tasks 8-13)
+- `npm run typecheck` (frontend/mobile-app) -> pass
+- `npm run lint` (frontend/mobile-app) -> pass
+- `npm run test` (frontend/mobile-app) -> pass (35 passed)
+- Manual smoke (Expo boot): `npm run start` (frontend/mobile-app) -> pass (Metro started and app routes compiled, then process stopped).
+
 ## Security Notes (Feature 006 Milestone A)
 - Risks considered: insecure session persistence, local data leakage from routing state, and permission-flow dead ends in onboarding.
 - Controls applied: access token persisted with `expo-secure-store`, non-sensitive last-active-list id persisted with AsyncStorage, push permission request handled with deny-safe continuation path, and no secret/token values logged in screen flows.
 - Residual risks: refresh-token lifecycle and full auth error taxonomy are deferred to Feature 001 auth implementation slices.
+
+## Security Notes (Feature 006 Milestone B - Task 7)
+- Risks considered: unsafe user-provided list names, auth token leakage in logs, and overexposure of backend error details to users.
+- Controls applied: list-name input trimming and non-empty validation before create requests, bearer-token transport only through Authorization header, and user-safe generic error messages in list loading/create flows.
+- Residual risks: list schema normalization currently supports multi-shape payload fallback and should be tightened once backend contract fields are locked for frontend Task 8+ slices.
+
+## Security Notes (Feature 006 Milestone B - Tasks 8-13)
+- Risks considered: unvalidated item-edit payloads, destructive action misclicks, unauthorized sharing/profile access attempts, and unsafe fallback behavior during backend unavailability.
+- Controls applied: positive quantity/name validation in quick-add and editor flows, explicit reusable confirmation dialog for reset/delete actions, bearer-token-only protected API calls for list/profile/sharing operations, and user-safe fallback messages without sensitive runtime details.
+- Residual risks: offline mutation replay durability remains pending Task 16, and push dedupe/quiet-hours enforcement remains tied to backend event policy verification.
 
 ## Next Actions
 1. Create implementation plan per feature with impact labels:

@@ -43,47 +43,54 @@
   - Fallback to lists collection if no active list exists.
   - Requirement: FR-ui-02, FR-ui-03
 
-- [ ] 7. Implement Lists collection screen
+- [x] 7. Implement Lists collection screen
   - Build lists overview with summary metadata cards.
   - Add create-list action and empty/loading/error/offline states.
   - Add entry point to history screen.
+  - Add unit tests for summary/list mapping behavior and metadata formatting.
   - Requirement: FR-ui-05, FR-ui-12, FR-ui-13
 
-- [ ] 8. Implement active list screen core interactions
+- [x] 8. Implement active list screen core interactions
   - Render categorized item groups.
   - Add explicit checkbox purchase toggle.
   - Add inline quick-add bar.
   - Implement pending queue badge and offline banner.
+  - Add unit tests for category grouping and action copy behavior.
   - Requirement: FR-ui-06, FR-ui-08, FR-ui-13, NFR-01
 
-- [ ] 9. Implement item editor modal
+- [x] 9. Implement item editor modal
   - Build full edit modal with name, quantity, unit, category, and note.
   - Add validation and save/cancel behaviors.
   - Add optimistic update and rollback handling.
+  - Add unit tests for validation and payload normalization logic.
   - Requirement: FR-ui-06, FR-ui-07, FR-ui-13
 
-- [ ] 10. Implement destructive confirmation patterns
+- [x] 10. Implement destructive confirmation patterns
   - Add confirmations for reset list, delete item, and delete list.
   - Keep sign-out action without destructive modal.
   - Add reusable danger dialog component.
+  - Add component unit tests for danger dialog visibility and action wiring.
   - Requirement: FR-ui-15
 
-- [ ] 11. Implement sharing and members flows
+- [x] 11. Implement sharing and members flows
   - Build members screen with membership details.
   - Build share screen with generate, copy, revoke link actions.
   - Display link expiration and action feedback states.
+  - Add unit tests for share-link mapper validity and malformed payload handling.
   - Requirement: FR-ui-09
 
-- [ ] 12. Implement profile and about screens
+- [x] 12. Implement profile and about screens
   - Build profile screen with basic user data and sign-out action.
   - Build notifications settings screen entry and toggle controls.
   - Build about/version screen.
+  - Add unit tests for deterministic About metadata assembly.
   - Requirement: FR-ui-10, FR-ui-11
 
-- [ ] 13. Implement history and quick restore flows
+- [x] 13. Implement history and quick restore flows
   - Build closed-shopping history basic view.
   - Add quick restore action for last pre-reset snapshot.
   - Include empty/error/loading states.
+  - Add unit tests for restore feedback generation logic.
   - Requirement: FR-ui-12, FR-ui-13
 
 - [ ] 14. Implement Tamagui token and component baseline
