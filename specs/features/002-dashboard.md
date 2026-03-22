@@ -28,5 +28,5 @@ Provide a practical post-login home screen where users can open the active shopp
 - Add UI tests for navigation to list detail.
 
 ## Traceability
-- Code: backend/python-api/lists/**, frontend/Dutylist/app/(tabs)/index.tsx
-- Tests: backend/python-api/tests/integration/lists/**, frontend/Dutylist/**/__tests__/home/**
+- Code: backend/python-api/app/modules/lists/**, frontend/mobile-app/app/(tabs)/lists/index.tsx
+- Tests: backend/python-api/tests/integration/lists/**, frontend/mobile-app/tests/**/home/**

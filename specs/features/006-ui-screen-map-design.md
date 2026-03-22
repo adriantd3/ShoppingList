@@ -47,7 +47,7 @@ app/
   - unauthenticated -> auth flow
   - authenticated -> lists flow
 - Post-auth routing:
-  - if last active list exists -> open `/(tabs)/lists/[listId]`
+  - if locally persisted last active list exists and is accessible -> open `/(tabs)/lists/[listId]`
   - else -> open `/(tabs)/lists`
 - Tabs are fixed to `Lists` and `Profile`; all other screens are pushed in stack from those contexts.
 
@@ -57,6 +57,7 @@ app/
 - Auth session state: token lifecycle and identity metadata
 - App preferences state: first-launch flag, notification preference toggles
 - Connectivity state: online/offline and queue status
+- Local navigation state: last active list id persisted on-device and validated on app entry
 
 ### Server State (React Query)
 - Lists collection summaries
@@ -67,9 +68,11 @@ app/
 ### Offline Queue Model
 - Queue type: append-only local operation queue
 - MVP queued operations:
+  - add item
+  - edit item
+  - delete item
   - check item
   - uncheck item
-  - quick item add
 - Queue behavior:
   - enqueue while offline
   - optimistic UI update immediately
@@ -167,6 +170,15 @@ app/
 - If denied:
   - continue onboarding and app usage without blocking
   - expose re-enable path in Profile > Notifications
+
+## Push Notification Policy (MVP)
+- Quiet hours:
+  - defer push delivery from 22:00 to 07:00 local device time.
+- Dedupe and saturation controls:
+  - share-link accepted: dedupe by `(list_id, accepter_user_id)` for 30 minutes.
+  - item added: aggregate per list and send at most one push per list per 30-minute window.
+  - reset executed: dedupe by `list_id` for 15 minutes.
+  - shopping ended: dedupe by `(list_id, shopping_cycle_id)` for 12 hours.
 
 ## Error and Confirmation Patterns
 - Per-screen error panels with retry action

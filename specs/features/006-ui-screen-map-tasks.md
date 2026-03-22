@@ -99,7 +99,7 @@
   - Requirement: FR-ui-19
 
 - [ ] 16. Implement offline queue service
-  - Add persistent queue for offline-capable actions.
+  - Add persistent queue for item mutations (add/edit/delete/check/uncheck).
   - Replay queued actions on reconnect with retry policy.
   - Surface replay failures in per-screen error state.
   - Requirement: FR-ui-13

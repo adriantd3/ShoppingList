@@ -55,8 +55,7 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- Structural guard test added to fail CI if `app/tests` or flat test files under layer roots reappear.
 
 ## Open Gaps
-- No migration execution yet from Java modules to Python runtime path.
-- No frontend migration execution yet from existing UI components to Tamagui.
+- Legacy Java module archive/removal plan is pending execution (modules are record-only and out of active development).
 - UI screen-map, technical design, and implementation task breakdown are defined for feature 006.
 - No explicit performance/load validation runs yet for NFR targets.
 - Feature 007 Milestone D is complete (tasks 15-20 executed: contract/realtime integration suites, security evidence rollup, contract publication, and final traceability sweep).
@@ -76,6 +75,23 @@ Context: Brownfield repository with existing frontend and backend codebases, wit
 	- Keep latest pre-reset snapshot only, expiring after 30 days.
 - Locked performance validation profile (MVP baseline):
 	- Warm-runtime measurements, 100 requests, 10 concurrent virtual users, p95 target validation per feature threshold.
+- Locked frontend runtime direction:
+	- `frontend/mobile-app` is the canonical MVP frontend runtime.
+	- `frontend/Dutylist` is legacy and may be archived/removed without affecting MVP runtime.
+	- Legacy Java backend modules are record-only, out of active development, and may be archived/removed without affecting MVP runtime.
+- Locked collaboration permissions and navigation ownership:
+	- List owner is creator and controls list-level properties/delete actions.
+	- Members can fully edit list content (item-level mutations) but cannot change list properties or delete list.
+	- Last active list is persisted locally on the client and used for post-auth entry when accessible.
+- Locked push-notification scope policy:
+	- Only share-link accepted, item added (anti-saturation), reset executed, and shopping ended generate push events in MVP.
+	- Quiet hours and per-event dedupe policies are required.
+- Locked implementation-friendly validation approach for MVP:
+	- Use the simplest lightweight local scripted performance checks.
+	- Keep performance validation non-blocking in CI until post-MVP hardening.
+- Locked deployment topology for MVP:
+	- MVP deploys as a single-instance monolith.
+	- Multi-instance scaling concerns are deferred to post-MVP hardening.
 
 ## Milestone D Execution Status (Feature 007)
 - Completed scope:

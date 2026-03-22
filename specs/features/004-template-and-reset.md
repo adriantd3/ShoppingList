@@ -31,5 +31,5 @@ Model the refrigerator-style shopping workflow: persistent base items, flexible 
 - Add integration tests for reset snapshot and recovery flow.
 
 ## Traceability
-- Code: backend/python-api/templates/**, backend/python-api/lists/reset/**, frontend/Dutylist/components/lists/**
-- Tests: backend/python-api/tests/integration/templates/**, backend/python-api/tests/integration/reset/**, frontend/Dutylist/**/__tests__/reset/**
+- Code: backend/python-api/app/modules/lists/**, backend/python-api/app/modules/realtime/**, frontend/mobile-app/features/lists/**
+- Tests: backend/python-api/tests/integration/lists/test_reset_restore_contract.py, frontend/mobile-app/tests/**/reset/**

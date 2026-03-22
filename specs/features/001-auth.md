@@ -35,5 +35,5 @@ Provide low-friction authentication for a family-oriented MVP using email/passwo
 - Add frontend integration tests for successful and failed sign-in states.
 
 ## Traceability
-- Code: backend/python-api/auth/**, frontend/Dutylist/app/auth/**
-- Tests: backend/python-api/tests/integration/auth/**, frontend/Dutylist/**/__tests__/auth/**
+- Code: backend/python-api/app/modules/auth/**, frontend/mobile-app/app/(auth)/**
+- Tests: backend/python-api/tests/integration/core/test_auth_contract.py, frontend/mobile-app/tests/**/auth/**
